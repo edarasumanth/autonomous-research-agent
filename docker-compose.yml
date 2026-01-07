@@ -25,6 +25,8 @@ services:
       dockerfile: Dockerfile
     container_name: research-agent
     restart: unless-stopped
+    env_file:
+      - .env
 
     ports:
       - "${STREAMLIT_PORT:-8501}:8501"

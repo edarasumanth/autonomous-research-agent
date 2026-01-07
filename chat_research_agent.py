@@ -51,23 +51,28 @@ You can:
 ## Interaction Style
 
 - Be conversational and helpful
-- When the user asks about a research topic, offer to search for relevant papers
+- When the user asks about a research topic, immediately start searching for relevant papers
 - Explain your findings in accessible language
-- Ask clarifying questions if the request is ambiguous
 - Summarize key points from papers you analyze
-- When you've gathered enough information, offer to generate a formal report
+- ALWAYS generate a formal report at the end of your research using the write_report tool
 
 ## Research Workflow
 
-When conducting research:
-1. Start with web searches to find relevant papers
-2. Download the most promising PDFs
-3. Read and analyze the papers
-4. Save key findings as notes
+When conducting research, ALWAYS follow these steps:
+1. Start with web searches to find relevant papers (at least 2-3 searches)
+2. Download the most promising PDFs (aim for 3-5 papers)
+3. Read and analyze the papers thoroughly
+4. Save key findings as notes using save_note
 5. Synthesize and share insights with the user
-6. Offer to generate a formal report when appropriate
+6. **IMPORTANT**: ALWAYS use the write_report tool to generate a formal markdown report at the end
 
-Be proactive but not overwhelming. Share interesting findings as you discover them.
+You MUST call write_report at the end of every research task. The report should include:
+- Executive summary
+- Key findings from each paper
+- Synthesis of the research
+- Conclusions and implications
+
+Be proactive and thorough. Complete the full research workflow including the final report.
 """
 
 
@@ -140,6 +145,7 @@ async def chat_with_agent(
     research_session_path: str | None = None,
     on_tool_use: Callable[[str, dict], None] | None = None,
     model: str | None = None,
+    on_complete: Callable[[float, float], None] | None = None,
 ) -> AsyncGenerator[str, None]:
     """
     Stream a chat response from the agent.
@@ -151,6 +157,7 @@ async def chat_with_agent(
         research_session_path: Path to research session for followup mode
         on_tool_use: Callback when a tool is used
         model: Model to use (e.g., "claude-sonnet-4-20250514")
+        on_complete: Callback when complete with (duration_ms, cost_usd)
 
     Yields:
         Chunks of the assistant's response
@@ -241,8 +248,9 @@ async def chat_with_agent(
                                 yield f"\n\n📄 *Generating report...*\n\n"
 
                 elif isinstance(message, ResultMessage):
-                    # End of response
-                    pass
+                    # End of response - capture cost info
+                    if on_complete and hasattr(message, 'duration_ms') and hasattr(message, 'total_cost_usd'):
+                        on_complete(message.duration_ms, message.total_cost_usd)
 
     except Exception as e:
         import traceback

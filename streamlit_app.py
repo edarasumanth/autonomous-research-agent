@@ -24,6 +24,8 @@ import asyncio
 import streamlit as st
 import base64
 import json
+import random
+import shutil
 import traceback
 from datetime import datetime
 
@@ -54,30 +56,44 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Custom CSS
+# Custom CSS - Enhanced UI
 st.markdown("""
 <style>
+    /* Main container */
     .main .block-container {
-        padding-top: 2rem;
+        padding-top: 1.5rem;
         padding-bottom: 2rem;
         max-width: 1200px;
     }
 
+    /* Sidebar styling */
     [data-testid="stSidebar"] {
-        background-color: #f8f9fa;
+        background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
     }
 
+    [data-testid="stSidebar"] .stButton > button {
+        transition: all 0.2s ease;
+    }
+
+    [data-testid="stSidebar"] .stButton > button:hover {
+        transform: translateX(3px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Main header */
     .main-header {
         background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         color: white;
         padding: 1.5rem 2rem;
-        border-radius: 12px;
+        border-radius: 16px;
         margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
     }
 
     .main-header h1 {
         margin: 0;
         font-size: 1.8rem;
+        font-weight: 700;
     }
 
     .main-header p {
@@ -86,59 +102,63 @@ st.markdown("""
         font-size: 0.95rem;
     }
 
-    .chat-message {
+    /* Metrics styling */
+    [data-testid="stMetric"] {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
         padding: 1rem;
         border-radius: 12px;
-        margin-bottom: 1rem;
-    }
-
-    .chat-message.user {
-        background: #e3f2fd;
-        margin-left: 20%;
-    }
-
-    .chat-message.assistant {
-        background: #f5f5f5;
-        margin-right: 10%;
-    }
-
-    .tool-notification {
-        background: #fff3e0;
-        padding: 0.5rem 1rem;
-        border-radius: 8px;
-        margin: 0.5rem 0;
-        font-size: 0.9rem;
-        border-left: 3px solid #ff9800;
-    }
-
-    .stats-row {
-        display: flex;
-        gap: 1rem;
-        margin: 1rem 0;
-    }
-
-    .stat-box {
-        background: white;
-        padding: 1rem;
-        border-radius: 8px;
         border: 1px solid #e0e0e0;
-        text-align: center;
-        flex: 1;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
-    .stat-value {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #667eea;
-    }
-
-    .stat-label {
-        font-size: 0.8rem;
+    [data-testid="stMetric"] label {
         color: #666;
+        font-size: 0.85rem;
     }
 
-    .stButton > button {
+    [data-testid="stMetric"] [data-testid="stMetricValue"] {
+        color: #667eea;
+        font-weight: 600;
+    }
+
+    /* Chat messages */
+    .stChatMessage {
+        border-radius: 16px;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+    }
+
+    /* Expander styling */
+    .streamlit-expanderHeader {
+        background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
         border-radius: 8px;
+        font-weight: 500;
+    }
+
+    .streamlit-expanderHeader:hover {
+        background: linear-gradient(135deg, #e9ecef 0%, #f8f9fa 100%);
+    }
+
+    /* Tabs styling */
+    .stTabs [data-baseweb="tab-list"] {
+        gap: 8px;
+    }
+
+    .stTabs [data-baseweb="tab"] {
+        border-radius: 8px 8px 0 0;
+        padding: 10px 20px;
+        font-weight: 500;
+    }
+
+    /* Button styling */
+    .stButton > button {
+        border-radius: 10px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+    }
+
+    .stButton > button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
     .stButton > button[kind="primary"] {
@@ -146,15 +166,58 @@ st.markdown("""
         border: none;
     }
 
-    .pdf-frame {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        overflow: hidden;
+    .stButton > button[kind="secondary"] {
+        border: 2px solid #667eea;
+        color: #667eea;
     }
 
-    /* Chat input styling */
-    .stChatInput {
+    /* Info/Success/Warning boxes */
+    .stAlert {
         border-radius: 12px;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    /* Chat input */
+    .stChatInput > div {
+        border-radius: 24px;
+        border: 2px solid #e0e0e0;
+        transition: border-color 0.2s ease;
+    }
+
+    .stChatInput > div:focus-within {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    /* Selectbox styling */
+    .stSelectbox > div > div {
+        border-radius: 8px;
+    }
+
+    /* Progress spinner */
+    .stSpinner > div {
+        border-color: #667eea;
+    }
+
+    /* Download button */
+    .stDownloadButton > button {
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+    }
+
+    .stDownloadButton > button:hover {
+        background: #218838;
+    }
+
+    /* Code blocks in notes */
+    code {
+        background: #f1f3f4;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 0.9em;
     }
 
     /* Session card in sidebar */
@@ -162,13 +225,15 @@ st.markdown("""
         padding: 0.75rem;
         margin-bottom: 0.5rem;
         background: white;
-        border-radius: 8px;
+        border-radius: 10px;
         border: 1px solid #e0e0e0;
         cursor: pointer;
+        transition: all 0.2s ease;
     }
 
     .session-item:hover {
         border-color: #667eea;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
     }
 </style>
 """, unsafe_allow_html=True)
@@ -235,6 +300,9 @@ with st.sidebar:
 
     # New Chat button
     if st.button("💬 New Chat", use_container_width=True, type="primary"):
+        # Reset quick topics for fresh experience
+        if "quick_topics" in st.session_state:
+            del st.session_state.quick_topics
         switch_to_chat()
         st.rerun()
 
@@ -245,15 +313,57 @@ with st.sidebar:
         st.rerun()
 
     st.markdown("---")
-    st.markdown("### 📁 Research History")
+
+    # Research History section with management
+    history_col1, history_col2 = st.columns([3, 1])
+    with history_col1:
+        st.markdown("### 📁 Research History")
+    with history_col2:
+        # Clear history button (small)
+        if "confirm_clear" not in st.session_state:
+            st.session_state.confirm_clear = False
 
     # List sessions
     sessions = list_research_sessions()
 
-    if not sessions:
-        st.caption("No research sessions yet")
+    # Filter to show only meaningful sessions (with metadata or completion)
+    valid_sessions = [s for s in sessions if s.get("metadata") or s.get("completion") or s.get("has_report") or len(s.get("pdfs", [])) > 0]
+
+    if not valid_sessions:
+        st.caption("✨ No research sessions yet")
+        st.caption("Start a new chat to begin researching!")
     else:
-        for session in sessions:
+        # Show count and clear option
+        st.caption(f"📊 {len(valid_sessions)} session(s)")
+
+        # Clear all history button with confirmation
+        if st.session_state.confirm_clear:
+            st.warning("⚠️ Delete all sessions?")
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("✓ Yes", use_container_width=True, type="primary"):
+                    # Delete all sessions
+                    for session in valid_sessions:
+                        try:
+                            shutil.rmtree(session["path"])
+                        except:
+                            pass
+                    st.session_state.confirm_clear = False
+                    st.session_state.selected_session = None
+                    st.session_state.current_view = "chat"
+                    st.rerun()
+            with col2:
+                if st.button("✗ No", use_container_width=True):
+                    st.session_state.confirm_clear = False
+                    st.rerun()
+        else:
+            if st.button("🗑️ Clear All History", use_container_width=True, type="secondary"):
+                st.session_state.confirm_clear = True
+                st.rerun()
+
+        st.markdown("---")
+
+        for session in valid_sessions:
             # Parse info
             try:
                 date_str = session["folder"][:15]
@@ -263,34 +373,62 @@ with st.sidebar:
                 date_display = ""
 
             topic = session.get("metadata", {}).get("topic", session["topic"])
-            if len(topic) > 30:
-                topic = topic[:30] + "..."
+            # Clean up topic display
+            topic = topic.replace("_", " ").replace("chat research", "").strip()
+            if not topic or topic.lower() in ["chat", "research"]:
+                topic = "Research Session"
+            if len(topic) > 28:
+                topic = topic[:25] + "..."
 
-            # Status
-            status = "✅" if session.get("completion") else "⏳"
+            # Status - check for completion AND report
+            has_completion = session.get("completion") is not None
+            has_report = session.get("has_report", False)
             pdf_count = len(session.get("pdfs", []))
 
+            # Determine status icon
+            if has_completion and has_report:
+                status = "✅"  # Fully complete with report
+            elif has_completion and pdf_count > 0:
+                status = "📄"  # Complete with PDFs but no report
+            elif has_completion:
+                status = "📝"  # Complete but minimal data
+            else:
+                status = "⏳"  # In progress
+
             # Model info
-            model = session.get("metadata", {}).get("model", "")
+            model = session.get("metadata", {}).get("model", "") or session.get("completion", {}).get("model", "")
             model_short = ""
             if model:
                 if "opus" in model.lower():
-                    model_short = "Opus"
+                    model_short = "🧠"
                 elif "sonnet" in model.lower():
-                    model_short = "Sonnet"
+                    model_short = "⚡"
                 elif "haiku" in model.lower():
-                    model_short = "Haiku"
-                else:
-                    model_short = model.split("-")[0] if "-" in model else model[:10]
+                    model_short = "🚀"
 
-            # Button for each session
+            # Duration info
+            duration = session.get("completion", {}).get("duration_seconds", 0)
+            if duration >= 60:
+                duration_str = f"{int(duration//60)}m"
+            elif duration > 0:
+                duration_str = f"{int(duration)}s"
+            else:
+                duration_str = ""
+
+            # Build label
             btn_label = f"{status} **{topic}**"
+            meta_parts = []
             if date_display:
-                btn_label += f"\n\n{date_display}"
+                meta_parts.append(date_display)
             if model_short:
-                btn_label += f" • {model_short}"
+                meta_parts.append(model_short)
+            if duration_str:
+                meta_parts.append(duration_str)
             if pdf_count:
-                btn_label += f" • {pdf_count} PDFs"
+                meta_parts.append(f"📚{pdf_count}")
+
+            if meta_parts:
+                btn_label += f"\n\n{' • '.join(meta_parts)}"
 
             if st.button(btn_label, key=f"sess_{session['folder']}", use_container_width=True):
                 switch_to_session(session)
@@ -319,18 +457,61 @@ st.markdown("""
 if st.session_state.current_view == "chat":
     st.markdown("### 💬 Chat with Research Agent")
 
-    # Model selector row
+    # Model selector row with descriptions
     col1, col2 = st.columns([3, 1])
     with col1:
         st.caption("Ask me to research any topic. I'll search for papers, analyze them, and share my findings.")
     with col2:
-        st.session_state.chat_model = st.selectbox(
+        model_options = {
+            "claude-sonnet-4-20250514": "⚡ Sonnet (Fast)",
+            "claude-opus-4-20250514": "🧠 Opus (Best)",
+            "claude-haiku-3-5-20241022": "🚀 Haiku (Quick)"
+        }
+        selected_display = st.selectbox(
             "Model",
-            ["claude-sonnet-4-20250514", "claude-opus-4-20250514", "claude-haiku-3-5-20241022"],
-            index=["claude-sonnet-4-20250514", "claude-opus-4-20250514", "claude-haiku-3-5-20241022"].index(st.session_state.chat_model),
+            list(model_options.values()),
+            index=list(model_options.keys()).index(st.session_state.chat_model),
             key="chat_model_selector",
             label_visibility="collapsed"
         )
+        # Map back to model ID
+        st.session_state.chat_model = list(model_options.keys())[list(model_options.values()).index(selected_display)]
+
+    # Welcome section for new users (show when no messages)
+    if not st.session_state.chat_messages:
+        st.markdown("---")
+
+        # Welcome card
+        st.markdown("""
+        <div style="background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
+            <h4 style="margin: 0 0 0.5rem 0;">👋 Welcome to the Research Agent!</h4>
+            <p style="margin: 0; color: #555;">I can help you explore academic topics by searching papers, analyzing PDFs, and generating comprehensive reports.</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        # How it works
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.markdown("""
+            **🔍 Step 1: Ask**
+
+            Type your research topic or question in the chat below.
+            """)
+        with col2:
+            st.markdown("""
+            **📚 Step 2: Research**
+
+            I'll search for papers, download PDFs, and analyze the content.
+            """)
+        with col3:
+            st.markdown("""
+            **📄 Step 3: Report**
+
+            Get a comprehensive report with key findings and sources.
+            """)
+
+        st.markdown("---")
+        st.info("💡 **Tip:** Be specific! Instead of \"AI\", try \"Recent advances in transformer architectures for natural language processing\"")
 
     # Display chat messages
     for msg in st.session_state.chat_messages:
@@ -339,18 +520,29 @@ if st.session_state.current_view == "chat":
 
     # Control buttons (show after messages exist)
     if st.session_state.chat_messages:
-        col1, col2, col3 = st.columns([1, 1, 4])
+        st.markdown("---")
+        col1, col2, col3 = st.columns([1, 1, 2])
         with col1:
-            if st.button("🔄 New Research", use_container_width=True):
+            if st.button("🔄 New Research", use_container_width=True, type="primary"):
+                # Reset quick topics for fresh experience
+                if "quick_topics" in st.session_state:
+                    del st.session_state.quick_topics
                 clear_chat()
                 st.rerun()
         with col2:
             if st.button("🛑 End Session", use_container_width=True, type="secondary"):
                 st.session_state.stop_requested = True
                 st.success("Session ended. Start a new research or ask follow-up questions!")
+        st.markdown("---")
 
-    # Chat input
-    if prompt := st.chat_input("Ask me to research something...", key="chat_input"):
+    # Chat input - handle both manual input and quick topic buttons
+    chat_prompt = st.chat_input("Ask me to research something...", key="chat_input")
+
+    # Check for pending query from quick topic buttons
+    pending_query = st.session_state.pop("pending_query", None)
+    prompt = chat_prompt or pending_query
+
+    if prompt:
         # Add user message
         st.session_state.chat_messages.append({"role": "user", "content": prompt})
 
@@ -362,15 +554,14 @@ if st.session_state.current_view == "chat":
             response_placeholder = st.empty()
             response_container = [""]
 
-            # Check if this is a research request
-            research_keywords = ["research", "find papers", "search for", "look up", "investigate", "explore", "learn about", "tell me about"]
-            is_research = any(kw in prompt.lower() for kw in research_keywords)
-
             # Show spinner while processing
             with st.spinner("🔬 Researching... This may take a few minutes..."):
+                # Track start time for duration
+                start_time = datetime.now()
+
                 try:
-                    # Create session folder if research-like query
-                    if is_research and not st.session_state.chat_session_path:
+                    # Always create session folder if one doesn't exist
+                    if not st.session_state.chat_session_path:
                         from web_research_tools import ResearchConfig
                         topic_words = prompt.split()[:5]
                         topic_slug = "_".join(topic_words)[:30]
@@ -393,6 +584,13 @@ if st.session_state.current_view == "chat":
                     chat_history = list(st.session_state.chat_messages[:-1])
                     session_path = st.session_state.chat_session_path
 
+                    # Store cost info from callback
+                    cost_info = {"duration_ms": 0, "cost_usd": 0}
+
+                    def on_complete(duration_ms, cost_usd):
+                        cost_info["duration_ms"] = duration_ms
+                        cost_info["cost_usd"] = cost_usd
+
                     def run_async_chat(user_prompt, history, sess_path, chat_model):
                         """Run the async chat using anyio for proper task context."""
                         import anyio
@@ -408,6 +606,7 @@ if st.session_state.current_view == "chat":
                                 mode="research",
                                 research_session_path=sess_path,
                                 model=chat_model,
+                                on_complete=on_complete,
                             ):
                                 result += chunk
                             return result
@@ -421,17 +620,35 @@ if st.session_state.current_view == "chat":
 
                     response_placeholder.markdown(response_container[0])
 
-                    # Save completion.json if session exists and file doesn't exist yet
+                    # Save/update completion.json with duration and cost
                     if st.session_state.chat_session_path:
                         completion_path = os.path.join(st.session_state.chat_session_path, "completion.json")
-                        if not os.path.exists(completion_path):
+                        end_time = datetime.now()
+                        duration_seconds = (end_time - start_time).total_seconds()
+
+                        # Load existing completion data or create new
+                        if os.path.exists(completion_path):
+                            with open(completion_path, "r") as f:
+                                completion_data = json.load(f)
+                            # Add to existing duration and cost
+                            completion_data["duration_seconds"] = completion_data.get("duration_seconds", 0) + duration_seconds
+                            completion_data["cost_usd"] = completion_data.get("cost_usd", 0) + cost_info.get("cost_usd", 0)
+                        else:
                             completion_data = {
-                                "completed_at": datetime.now().isoformat(),
+                                "completed_at": end_time.isoformat(),
                                 "mode": "chat",
+                                "model": st.session_state.chat_model,
+                                "duration_seconds": duration_seconds,
+                                "cost_usd": cost_info.get("cost_usd", 0),
                                 "stats": {}
                             }
-                            with open(completion_path, "w") as f:
-                                json.dump(completion_data, f, indent=2)
+
+                        completion_data["last_updated"] = end_time.isoformat()
+                        with open(completion_path, "w") as f:
+                            json.dump(completion_data, f, indent=2)
+
+                        # Show completion summary
+                        st.success(f"✅ Research complete! Duration: {duration_seconds:.0f}s | Cost: ${cost_info.get('cost_usd', 0):.4f}")
 
                 except Exception as e:
                     error_details = traceback.format_exc()
@@ -441,34 +658,64 @@ if st.session_state.current_view == "chat":
             # Save assistant response
             st.session_state.chat_messages.append({"role": "assistant", "content": response_container[0]})
 
-    # Quick action buttons
+    # Quick action buttons with rotating topics
     st.markdown("---")
-    st.markdown("**Quick Research Topics:**")
+    st.markdown("**💡 Quick Research Topics:**")
+
+    # Pool of diverse research topics
+    ALL_RESEARCH_TOPICS = [
+        {"icon": "🧠", "label": "Transformer Architectures", "query": "Research transformer architectures in deep learning - key innovations and recent advances"},
+        {"icon": "🧬", "label": "CRISPR Gene Editing", "query": "Research CRISPR gene editing technology - mechanisms, applications, and ethical considerations"},
+        {"icon": "🌍", "label": "Climate AI", "query": "Research how AI and machine learning are being applied to climate change prediction and mitigation"},
+        {"icon": "🤖", "label": "Large Language Models", "query": "Research the latest advances in large language models - architectures, training methods, and capabilities"},
+        {"icon": "🧪", "label": "mRNA Vaccines", "query": "Research mRNA vaccine technology - how it works, advantages, and future applications beyond COVID-19"},
+        {"icon": "🔋", "label": "Solid-State Batteries", "query": "Research solid-state battery technology - current progress, challenges, and potential for electric vehicles"},
+        {"icon": "🌐", "label": "Web3 & Blockchain", "query": "Research Web3 technologies and blockchain - decentralized systems, smart contracts, and real-world applications"},
+        {"icon": "🧠", "label": "Neuromorphic Computing", "query": "Research neuromorphic computing - brain-inspired chips, architectures, and applications"},
+        {"icon": "🔬", "label": "Quantum Computing", "query": "Research quantum computing advances - qubit technologies, algorithms, and near-term applications"},
+        {"icon": "🏥", "label": "AI in Drug Discovery", "query": "Research AI applications in drug discovery - molecular design, clinical trials, and recent breakthroughs"},
+        {"icon": "🚀", "label": "Space Exploration Tech", "query": "Research recent advances in space exploration technology - propulsion, habitation, and Mars missions"},
+        {"icon": "🌱", "label": "Vertical Farming", "query": "Research vertical farming and controlled environment agriculture - technologies, economics, and sustainability"},
+        {"icon": "🎮", "label": "AI in Gaming", "query": "Research AI applications in video games - procedural generation, NPCs, and player modeling"},
+        {"icon": "🔐", "label": "Post-Quantum Cryptography", "query": "Research post-quantum cryptography - algorithms resistant to quantum attacks and standardization efforts"},
+        {"icon": "🧬", "label": "Synthetic Biology", "query": "Research synthetic biology - engineered organisms, biofuels, and biosensors"},
+        {"icon": "🏗️", "label": "3D Printed Construction", "query": "Research 3D printing in construction - materials, techniques, and sustainable building applications"},
+        {"icon": "🧠", "label": "Brain-Computer Interfaces", "query": "Research brain-computer interfaces - neural implants, non-invasive methods, and medical applications"},
+        {"icon": "🌊", "label": "Ocean Energy", "query": "Research ocean energy technologies - wave, tidal, and thermal energy conversion systems"},
+        {"icon": "🤖", "label": "Autonomous Vehicles", "query": "Research autonomous vehicle technology - sensors, decision-making systems, and regulatory challenges"},
+        {"icon": "💊", "label": "Personalized Medicine", "query": "Research personalized medicine - genomics, pharmacogenomics, and tailored treatment approaches"},
+        {"icon": "🌿", "label": "Carbon Capture", "query": "Research carbon capture and storage technologies - direct air capture, geological storage, and utilization"},
+        {"icon": "🔮", "label": "Augmented Reality", "query": "Research augmented reality technology - displays, tracking, and enterprise applications"},
+        {"icon": "🧫", "label": "Lab-Grown Meat", "query": "Research cultured meat technology - cell cultivation, scaling challenges, and environmental impact"},
+        {"icon": "⚡", "label": "Nuclear Fusion", "query": "Research nuclear fusion energy - tokamaks, stellarators, and recent breakthrough experiments"},
+    ]
+
+    # Initialize or get random topics for this session
+    if "quick_topics" not in st.session_state:
+        st.session_state.quick_topics = random.sample(ALL_RESEARCH_TOPICS, 3)
+
     col1, col2, col3 = st.columns(3)
+    topics = st.session_state.quick_topics
 
     with col1:
-        if st.button("🧠 Transformer Architectures", use_container_width=True):
-            st.session_state.chat_messages.append({
-                "role": "user",
-                "content": "Research transformer architectures in deep learning - key innovations and recent advances"
-            })
+        if st.button(f"{topics[0]['icon']} {topics[0]['label']}", use_container_width=True):
+            st.session_state.pending_query = topics[0]['query']
             st.rerun()
 
     with col2:
-        if st.button("🧬 CRISPR Gene Editing", use_container_width=True):
-            st.session_state.chat_messages.append({
-                "role": "user",
-                "content": "Research CRISPR gene editing technology - mechanisms, applications, and ethical considerations"
-            })
+        if st.button(f"{topics[1]['icon']} {topics[1]['label']}", use_container_width=True):
+            st.session_state.pending_query = topics[1]['query']
             st.rerun()
 
     with col3:
-        if st.button("🌍 Climate AI", use_container_width=True):
-            st.session_state.chat_messages.append({
-                "role": "user",
-                "content": "Research how AI and machine learning are being applied to climate change prediction and mitigation"
-            })
+        if st.button(f"{topics[2]['icon']} {topics[2]['label']}", use_container_width=True):
+            st.session_state.pending_query = topics[2]['query']
             st.rerun()
+
+    # Refresh topics button
+    if st.button("🔄 Show different topics", type="secondary"):
+        st.session_state.quick_topics = random.sample(ALL_RESEARCH_TOPICS, 3)
+        st.rerun()
 
 
 # =============================================================================
@@ -577,8 +824,8 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
     comp = session.get("completion", {})
     stats = comp.get("stats", {})
 
-    # Get model info
-    model_full = session.get("metadata", {}).get("model", "Unknown")
+    # Get model info (try metadata first, fall back to completion)
+    model_full = session.get("metadata", {}).get("model") or comp.get("model", "Unknown")
     if "opus" in model_full.lower():
         model_display = "Opus"
     elif "sonnet" in model_full.lower():
@@ -598,19 +845,22 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
     paper_count = actual_pdfs or stats.get('pdfs_read', stats.get('reads', 0))
     notes_count = actual_notes or stats.get('notes_saved', stats.get('notes', 0))
 
+    # Enhanced metrics display with icons
     cols = st.columns(5)
     with cols[0]:
-        st.metric("Model", model_display)
+        model_icon = "🧠" if "opus" in model_full.lower() else "⚡" if "sonnet" in model_full.lower() else "🚀"
+        st.metric(f"{model_icon} Model", model_display)
     with cols[1]:
         duration = comp.get('duration_seconds', 0)
-        st.metric("Duration", f"{duration:.0f}s" if duration else "N/A")
+        duration_display = f"{int(duration//60)}m {int(duration%60)}s" if duration >= 60 else f"{int(duration)}s"
+        st.metric("⏱️ Duration", duration_display if duration else "—")
     with cols[2]:
         cost = comp.get('cost_usd')
-        st.metric("Cost", f"${cost:.2f}" if cost else "N/A")
+        st.metric("💰 Cost", f"${cost:.3f}" if cost else "—")
     with cols[3]:
-        st.metric("Papers", paper_count)
+        st.metric("📚 Papers", paper_count if paper_count else "—")
     with cols[4]:
-        st.metric("Notes", notes_count)
+        st.metric("📝 Notes", notes_count if notes_count else "—")
 
     # Tabs
     tab1, tab2, tab3 = st.tabs(["📄 Report", "📚 PDFs", "💬 Ask Questions"])
@@ -623,52 +873,114 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
             # No report - check if there are notes to display
             notes_dir = os.path.join(session["path"], "notes")
             if os.path.exists(notes_dir) and os.listdir(notes_dir):
-                st.warning("No formal report was generated for this session. Displaying research notes instead:")
-                st.markdown("---")
+                st.info("📋 **Research findings from this session:**")
+
+                # Group notes by type
+                findings = []
+                summaries = []
+                other_notes = []
+
                 for note_file in sorted(os.listdir(notes_dir)):
                     note_path = os.path.join(notes_dir, note_file)
                     try:
                         with open(note_path, "r", encoding="utf-8") as f:
                             note_data = json.load(f)
-                        st.markdown(f"### 📝 {note_data.get('title', note_file)}")
-                        if note_data.get('note_type'):
-                            st.caption(f"Type: {note_data['note_type']}")
-                        st.markdown(note_data.get('content', 'No content'))
-                        st.markdown("---")
-                    except Exception as e:
-                        st.error(f"Error reading note {note_file}: {e}")
+                            note_data['_filename'] = note_file
+                            note_type = note_data.get('type', note_data.get('note_type', 'other'))
+                            if note_type == 'finding':
+                                findings.append(note_data)
+                            elif note_type == 'paper_summary':
+                                summaries.append(note_data)
+                            else:
+                                other_notes.append(note_data)
+                    except Exception:
+                        pass
+
+                # Display paper summaries first
+                if summaries:
+                    st.markdown("### 📚 Paper Summaries")
+                    for note in summaries:
+                        with st.expander(f"📄 {note.get('title', 'Untitled')}", expanded=True):
+                            st.markdown(note.get('content', 'No content available'))
+
+                            # Source info
+                            source = note.get('source', '')
+                            if source and source != 'N/A':
+                                st.markdown(f"**Source:** {source}")
+
+                            # Tags
+                            tags = note.get('tags', [])
+                            if tags:
+                                st.markdown("**Tags:** " + " ".join([f"`{tag}`" for tag in tags]))
+                    st.markdown("")
+
+                # Display findings
+                if findings:
+                    st.markdown("### 💡 Key Findings")
+                    for note in findings:
+                        with st.expander(f"🔍 {note.get('title', 'Untitled')}", expanded=False):
+                            st.markdown(note.get('content', 'No content available'))
+
+                            source = note.get('source', '')
+                            if source and source != 'N/A':
+                                st.caption(f"📖 Source: {source}")
+
+                            tags = note.get('tags', [])
+                            if tags:
+                                st.caption("🏷️ " + " • ".join(tags))
+                    st.markdown("")
+
+                # Display other notes
+                if other_notes:
+                    st.markdown("### 📝 Additional Notes")
+                    for note in other_notes:
+                        with st.expander(f"📌 {note.get('title', 'Untitled')}", expanded=False):
+                            st.markdown(note.get('content', 'No content available'))
+
+                            source = note.get('source', '')
+                            if source and source != 'N/A':
+                                st.caption(f"Source: {source}")
+
             elif paper_count > 0:
-                st.info(f"No report available. This session has {paper_count} downloaded PDFs - you can view them in the PDFs tab or ask questions about them.")
+                st.info(f"📚 This session has **{paper_count} downloaded PDFs**. View them in the PDFs tab or ask questions about them.")
             else:
-                st.info("No report available. This session appears to be empty or incomplete.")
+                st.warning("⏳ This session appears to be empty or still in progress. Try running a new research query.")
 
     with tab2:
         pdfs = get_session_pdfs(session["path"])
         if not pdfs:
-            st.info("No PDFs in this session.")
+            st.info("📭 No PDFs have been downloaded in this session yet.")
         else:
-            st.markdown(f"**{len(pdfs)} Papers Downloaded:**")
+            st.success(f"📚 **{len(pdfs)} Research Papers Downloaded**")
 
-            for pdf in pdfs:
-                col1, col2 = st.columns([5, 1])
+            # PDF list with better formatting
+            for i, pdf in enumerate(pdfs, 1):
+                col1, col2, col3 = st.columns([0.5, 4.5, 1])
                 with col1:
-                    st.markdown(f"📄 {pdf}")
+                    st.markdown(f"**{i}.**")
                 with col2:
+                    # Clean up PDF name for display
+                    display_name = pdf.replace("_", " ").replace(".pdf", "")
+                    if len(display_name) > 60:
+                        display_name = display_name[:57] + "..."
+                    st.markdown(f"📄 {display_name}")
+                with col3:
                     pdf_path = get_pdf_path(session["path"], pdf)
                     if pdf_path:
                         with open(pdf_path, "rb") as f:
-                            st.download_button("⬇️", f.read(), pdf, "application/pdf", key=f"dl_{pdf}")
+                            st.download_button("⬇️ Download", f.read(), pdf, "application/pdf", key=f"dl_{pdf}")
 
             # PDF Viewer
             st.markdown("---")
-            selected_pdf = st.selectbox("View PDF:", [""] + pdfs)
-            if selected_pdf:
+            st.markdown("### 👁️ PDF Viewer")
+            selected_pdf = st.selectbox("Select a paper to view:", ["-- Select a PDF --"] + pdfs, key="pdf_viewer_select")
+            if selected_pdf and selected_pdf != "-- Select a PDF --":
                 pdf_path = get_pdf_path(session["path"], selected_pdf)
                 if pdf_path:
                     with open(pdf_path, "rb") as f:
                         b64 = base64.b64encode(f.read()).decode()
                     st.markdown(
-                        f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="700px"></iframe>',
+                        f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="700px" style="border: 1px solid #ddd; border-radius: 8px;"></iframe>',
                         unsafe_allow_html=True
                     )
 
