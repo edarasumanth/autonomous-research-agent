@@ -51,10 +51,10 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/autonomous-research-agent"
-Documentation = "https://github.com/yourusername/autonomous-research-agent#readme"
-Repository = "https://github.com/yourusername/autonomous-research-agent"
-Issues = "https://github.com/yourusername/autonomous-research-agent/issues"
+Homepage = "https://github.com/edarasumanth/autonomous-research-agent"
+Documentation = "https://github.com/edarasumanth/autonomous-research-agent#readme"
+Repository = "https://github.com/edarasumanth/autonomous-research-agent"
+Issues = "https://github.com/edarasumanth/autonomous-research-agent/issues"
 
 [project.scripts]
 research-agent = "streamlit_app:main"
