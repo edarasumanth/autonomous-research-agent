@@ -23,8 +23,12 @@ class Settings:
     anthropic_api_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
     tavily_api_key: str = field(default_factory=lambda: os.getenv("TAVILY_API_KEY", ""))
 
-    # Paths
-    base_dir: Path = field(default_factory=lambda: Path(__file__).parent.parent.parent)
+    # Paths - Use environment variable or /app for Docker, otherwise project root
+    base_dir: Path = field(
+        default_factory=lambda: Path(
+            os.getenv("BASE_DIR", "/app" if os.path.exists("/app") else str(Path.cwd()))
+        )
+    )
     research_sessions_dir: Path = field(default=None)
     papers_dir: Path = field(default=None)
 
