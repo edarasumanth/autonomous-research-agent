@@ -1,0 +1,14 @@
+{
+  "type": "synthesis",
+  "title": "MoE in LLMs: Key Insights and Tradeoffs",
+  "content": "**Synthesis: Mixture of Experts in Large Language Models**\n\n## How MoE Works\n\n**Core Mechanism**:\n- Replace dense FFN layers with multiple \"expert\" FFN networks + gating network\n- Gating network (router) selects which experts process each token\n- Sparse activation: only top-k experts activated per token (typically k=1 or k=2)\n- Output = weighted sum of selected expert outputs\n\n**Sparse Gating Formula**:\nG(x) = Softmax(TopK(x·Wg, k))\n- Linear projection followed by top-k selection and softmax normalization\n\n## Key Models\n\n1. **Switch Transformer (2021)**: Simplified top-1 routing, scaled to trillion parameters\n2. **Mixtral 8x7B (2024)**: 8 experts, top-2 routing, 47B total/13B active params, matches Llama 2 70B\n3. **DeepSeekMoE (2024)**: Fine-grained experts + shared experts for ultimate specialization\n\n## Benefits vs Dense Models\n\n**Benefits**:\n1. Parameter scaling without proportional compute increase\n2. Each token uses fraction of parameters (e.g., 13B active of 47B total)\n3. Faster inference at low batch sizes\n4. Expert specialization for different knowledge types\n5. DeepSeekMoE 16B matches LLaMA2 7B with only 40% compute\n\n**Tradeoffs**:\n1. Load imbalance across experts (requires auxiliary losses)\n2. Memory costs: must store ALL expert parameters even if sparsely used\n3. Routing overhead and complexity\n4. Token dropping when experts reach capacity\n5. Training instability without proper balancing mechanisms\n6. Communication overhead in distributed settings (Expert Parallelism)\n\n## Technical Innovations\n\n1. **Load Balancing**: Auxiliary loss functions ensure even token distribution\n2. **Expert Capacity**: Limits on tokens per expert prevent overload\n3. **Fine-grained Segmentation**: Split experts for more flexible combinations\n4. **Shared Experts**: Dedicated experts for common knowledge reduce redundancy",
+  "source": "Synthesized from Mixtral, Survey, and DeepSeekMoE papers",
+  "tags": [
+    "MoE",
+    "synthesis",
+    "benefits",
+    "tradeoffs",
+    "comparison"
+  ],
+  "timestamp": "2026-01-06T16:19:24.777828"
+}

@@ -1,0 +1,54 @@
+# =============================================================================
+# Docker Ignore File
+# =============================================================================
+
+# Virtual environment
+venv/
+.venv/
+env/
+.env.local
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.docker/
+
+# Test files
+test_*.py
+*_test.py
+
+# Documentation (optional - comment out if you want docs in image)
+*.md
+docs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Local development files
+.env.local
+.env.development
+
+# Research sessions (mounted as volume instead)
+# research_sessions/

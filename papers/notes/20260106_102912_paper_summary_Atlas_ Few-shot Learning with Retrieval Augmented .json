@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Atlas: Few-shot Learning with Retrieval Augmented LMs (Izacard et al., 2022)",
+  "content": "Atlas demonstrates that retrieval-augmented language models can achieve strong few-shot learning with significantly fewer parameters than large LLMs.\n\nARCHITECTURE:\n- Retriever: Contriever (dual-encoder, BERT-base) with dense embeddings\n- Language Model: T5 with Fusion-in-Decoder (processes documents independently, concatenates in decoder)\n- Joint pre-training of retriever and LM is crucial for few-shot performance\n\nRETRIEVER TRAINING OBJECTIVES:\n1. Attention Distillation (ADist): Uses cross-attention scores as document importance proxy\n2. EMDR2: Treats documents as latent variables, EM-inspired training\n3. Perplexity Distillation (PDist): Trains retriever to predict which docs improve LM perplexity\n4. LOOP: Leave-one-out perplexity - measures how much worse prediction gets without each doc\n\nPRE-TRAINING TASKS:\n- Prefix language modeling\n- Masked language modeling (best performing)\n- Title-to-section generation\n\nEFFICIENT FINE-TUNING:\n- Query-side fine-tuning: Only update query encoder, keep document encoder fixed (no index refresh needed)\n- Re-ranking: Retrieve more docs (L), re-rank with updated retriever, pass top-K to LM\n- Index refresh overhead: ~30% with full updates every 1000 steps\n\nKEY RESULTS:\n- NaturalQuestions 64-shot: 42.4% (vs PaLM 540B: 39.6%) with 50x fewer parameters\n- TriviaQA 64-shot: 74.4% (vs PaLM: 71.1%)\n- Full-dataset NQ: 64.0% (SOTA, +8.1% improvement)\n- MMLU 5-shot: 47.9% with de-biasing\n\nKEY INSIGHTS:\n- Memory can be outsourced to retrieval, decoupling memorization from generalization\n- Joint pre-training is essential for few-shot abilities\n- Index can be easily updated for temporal knowledge changes",
+  "source": "2208.03299.pdf",
+  "tags": [
+    "Atlas",
+    "few-shot learning",
+    "Fusion-in-Decoder",
+    "Contriever",
+    "joint pre-training"
+  ],
+  "timestamp": "2026-01-06T10:29:12.798464"
+}

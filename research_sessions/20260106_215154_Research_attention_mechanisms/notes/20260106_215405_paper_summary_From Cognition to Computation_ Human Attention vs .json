@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "From Cognition to Computation: Human Attention vs Transformer Architectures (Zhao et al., 2024)",
+  "content": "This paper provides a cognitive science perspective comparing human attention with Transformer attention mechanisms.\n\n**Similarities**\n1. **Selective Attention**: Both filter relevant information while ignoring distractions (cocktail party effect)\n2. **Contextual Understanding**: Both interpret stimuli within broader context\n\n**Key Differences**\n\n1. **Capacity Constraints**\n   - Humans: Limited visual field, working memory, sequential processing\n   - Transformers: Can process all tokens in parallel, no inherent biological limits\n\n2. **Attention Pathways**\n   - Humans: Dual pathway (top-down goal-directed + bottom-up stimulus-driven)\n   - Transformers: Purely data-driven, learned from training data only\n\n3. **Intentional Nature**\n   - Humans: Attention is deliberate, tied to agency, beliefs, goals, and intentions\n   - Transformers: Mathematical construct without cognitive states\n\n**Open Research Questions**\n1. Should AI emulate human capacity constraints?\n2. How can models adopt resource-rational approaches?\n3. How can attention generate meaningful representations?\n4. How can attention be formulated as an explicit component of agency?\n\n**Key Insight**: The shared terminology of \"attention\" creates parallels but also ambiguities - human attention involves Theory of Mind, joint attention, and social cognition that Transformers lack.",
+  "source": "arXiv:2407.01548",
+  "tags": [
+    "attention",
+    "cognitive science",
+    "human cognition",
+    "transformer",
+    "comparison"
+  ],
+  "timestamp": "2026-01-06T21:54:05.777959"
+}

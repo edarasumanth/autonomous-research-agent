@@ -1,0 +1,13 @@
+{
+  "type": "synthesis",
+  "title": "Key Insights and Themes Across RAG Literature",
+  "content": "MAJOR THEMES SYNTHESIZED FROM 10+ PAPERS:\n\n1. ARCHITECTURAL EVOLUTION:\n   - Basic RAG (2020): DPR + BART with marginalization over docs\n   - Advanced RAG: Pre/post-retrieval optimizations, re-ranking, compression\n   - Modular RAG: Flexible components, adaptive retrieval, self-reflection\n\n2. RETRIEVAL INNOVATIONS:\n   - Dense vs Sparse: Dense (DPR, Contriever) captures semantics; sparse (BM25) handles keywords\n   - Hybrid approaches combine both for robustness\n   - Unsupervised training via contrastive learning (Contriever)\n   - Query optimization: rewriting, expansion, HyDE\n\n3. GENERATION ENHANCEMENTS:\n   - Fusion-in-Decoder: Attend to multiple passages simultaneously\n   - Self-reflection (Self-RAG): Generate critique tokens for quality control\n   - Corrective mechanisms (CRAG): Detect and fix retrieval errors\n\n4. TRAINING PARADIGMS:\n   - Joint training of retriever and generator (Atlas, RAG)\n   - Distillation from LLM to retriever (REPLUG, LLM-Embedder)\n   - Query-side only fine-tuning for efficiency\n\n5. EVALUATION DIMENSIONS:\n   - Retrieval: Recall@K, MRR, nDCG\n   - Generation: Exact match, F1, faithfulness, citation accuracy\n   - Holistic: FactScore, RAGAS framework\n\n6. CRITICAL CHALLENGES:\n   - Hallucination persists even with retrieval\n   - Latency vs accuracy tradeoffs\n   - Context window limitations\n   - Attribution and verifiability\n\n7. EMERGING DIRECTIONS:\n   - Adaptive/on-demand retrieval (FLARE, Self-RAG)\n   - Agentic RAG with tool use\n   - Multimodal RAG\n   - Privacy-preserving RAG for enterprise",
+  "source": "",
+  "tags": [
+    "synthesis",
+    "themes",
+    "insights",
+    "evolution"
+  ],
+  "timestamp": "2026-01-06T10:29:58.603327"
+}

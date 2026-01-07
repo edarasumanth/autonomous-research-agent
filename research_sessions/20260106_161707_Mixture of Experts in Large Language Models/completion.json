@@ -1,0 +1,14 @@
+{
+  "completed_at": "2026-01-06T16:20:37.303587",
+  "duration_seconds": 210.049042,
+  "api_duration_seconds": 205.686,
+  "cost_usd": 0.679625,
+  "num_turns": 14,
+  "stats": {
+    "searches": 3,
+    "downloads": 3,
+    "pdfs_read": 3,
+    "notes_saved": 4,
+    "report_generated": true
+  }
+}

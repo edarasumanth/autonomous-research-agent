@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Benchmarks and Metrics for Evaluations of Code Generation: A Critical Review",
+  "content": "Critical review of evaluation methods for code generation LLMs (2024).\n\n**Major Benchmarks:**\n- HumanEval: 164 function-level Python tasks, domain expert created, avg 7.7 test cases\n- MBPP: 974 function-level Python tasks, crowd-sourced, 3 test cases each\n- APPS: 10,000 program-level Python tasks from coding challenges (3 difficulty levels)\n- ClassEval: 100 class-level Python tasks, avg 33.1 test cases, high coverage\n- CoderEval: 230 Python/Java tasks from GitHub, pragmatic code generation\n- MultiPL-E: Multi-language extension of HumanEval/MBPP\n- DS-1000: 1000 statement-level Python tasks from Stack Overflow\n\n**Evaluation Metrics:**\n1. Functional Correctness:\n   - pass@k: probability of at least one correct solution in k trials\n   - Test Pass Rate (TPR): percentage of test cases passed\n\n2. Syntactic Similarity:\n   - BLEU: n-gram precision comparison\n   - ROUGE-L: longest common subsequence\n   - CodeBLEU: extends BLEU with AST and data flow matching\n   - RUBY: compares Program Dependency Graphs\n\n**Key Findings:**\n- BLEU fails to assess functional correctness (inversely correlated)\n- ChrF is closest match to human assessment but not perfect\n- Code-specific metrics (RUBY, CodeBLEU) don't outperform generic metrics\n- Improvements < 2 points may not be statistically significant\n- pass@k doesn't reflect real usability (users don't run LLMs multiple times)\n\n**Research Gaps:**\n- Need metrics reflecting usability, not just correctness\n- Benchmarks lack diversity (single source)\n- Test adequacy varies significantly across benchmarks",
+  "source": "2406.12655.pdf",
+  "tags": [
+    "benchmarks",
+    "evaluation",
+    "metrics",
+    "humaneval",
+    "mbpp"
+  ],
+  "timestamp": "2026-01-06T10:23:28.046563"
+}

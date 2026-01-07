@@ -1,0 +1,12 @@
+{
+  "type": "insight",
+  "title": "Training Approaches for Code LLMs",
+  "content": "**Key Training Insights:**\n\n1. **Foundation Model Initialization:**\n   - Starting from pretrained LLMs (like Llama 2) outperforms training from scratch\n   - Code Llama trained from scratch needed ~240B more tokens to match Llama 2-initialized version\n\n2. **Data Composition:**\n   - Code-heavy datasets (85%+ code) with some natural language (7-8%)\n   - Near-deduplicated publicly available code\n   - Adding NL discussions about code improves MBPP performance\n\n3. **Specialization Benefits:**\n   - Python specialization (100B extra tokens) yields 4.3-8.3% improvement on HumanEval\n   - Code Llama - Python 7B outperforms Code Llama 13B\n\n4. **Infilling Training:**\n   - Fill-in-the-middle (FIM) objective enables code completion in IDEs\n   - Only modest cost (~0.6-1.1% points) on standard benchmarks\n   - Prefix-Suffix-Middle (PSM) and Suffix-Prefix-Middle (SPM) formats\n\n5. **Long Context:**\n   - RoPE position embedding modification (base period 10,000 → 1,000,000)\n   - Enables processing up to 100k tokens with stable behavior\n   - Small cost on short sequence benchmarks (~0.5-2 points)\n\n6. **Self-Instruct:**\n   - Generate problems → generate tests → generate solutions → filter by execution\n   - Improves instruction following with execution feedback",
+  "source": "2308.12950.pdf, 2406.00515.pdf",
+  "tags": [
+    "training",
+    "insights",
+    "techniques"
+  ],
+  "timestamp": "2026-01-06T10:23:28.147742"
+}

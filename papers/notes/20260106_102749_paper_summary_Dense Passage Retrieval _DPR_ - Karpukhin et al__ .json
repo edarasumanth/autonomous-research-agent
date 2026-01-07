@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Dense Passage Retrieval (DPR) - Karpukhin et al., 2020",
+  "content": "DPR demonstrates that dense retrieval can significantly outperform traditional sparse methods (BM25) for open-domain QA using a simple dual-encoder framework.\n\nARCHITECTURE:\n- Dual-encoder: Two independent BERT-base models for questions and passages\n- Similarity: dot product of [CLS] token embeddings (d=768)\n- Indexing: FAISS with HNSW for efficient approximate nearest neighbor search\n- Corpus: 21M Wikipedia passages (100 words each)\n\nTRAINING INNOVATIONS:\n- In-batch negatives: Reuse passages in mini-batch as negatives (B² pairs from batch size B)\n- Hard negatives: BM25 passages that match query but don't contain answer\n- Best config: gold passages as in-batch negatives + 1 BM25 hard negative\n- Only 1,000 examples needed to outperform BM25\n\nKEY RESULTS:\n- Top-20 accuracy: 78.4% vs 59.1% (BM25) on Natural Questions\n- End-to-end QA: 41.5% EM vs 33.3% (ORQA) on NQ\n- Cross-dataset generalization: Works well on unseen datasets\n- Speed: 995 questions/second with FAISS\n\nLIMITATIONS:\n- Lower performance on SQuAD due to high lexical overlap (annotators saw passages)\n- Index building is expensive (8.8 hours on 8 GPUs for embeddings)\n\nKEY INSIGHT: Simple fine-tuning of BERT encoders on question-passage pairs is sufficient without additional pretraining (unlike ORQA/REALM).",
+  "source": "2004.04906.pdf",
+  "tags": [
+    "DPR",
+    "dense retrieval",
+    "dual-encoder",
+    "BERT",
+    "in-batch negatives"
+  ],
+  "timestamp": "2026-01-06T10:27:49.541379"
+}

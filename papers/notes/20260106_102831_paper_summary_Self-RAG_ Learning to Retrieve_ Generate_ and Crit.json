@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Self-RAG: Learning to Retrieve, Generate, and Critique (Asai et al., 2023)",
+  "content": "Self-RAG introduces a framework that enhances LLM quality and factuality through on-demand retrieval and self-reflection using special \"reflection tokens.\"\n\nKEY INNOVATIONS:\n1. Reflection Tokens: Special tokens learned during training to control retrieval and critique generations\n   - Retrieve: Decides when to retrieve (yes/no/continue)\n   - ISREL: Evaluates if passage is relevant\n   - ISSUP: Evaluates if output is supported (fully/partially/no support)\n   - ISUSE: Evaluates overall utility (1-5 scale)\n\n2. Training Approach:\n   - Critic model (trained on GPT-4 annotations) generates reflection tokens offline\n   - Generator LM trained on corpus augmented with reflection tokens + retrieved passages\n   - Uses standard next-token prediction on expanded vocabulary (original + reflection tokens)\n   - No expensive RLHF training required\n\n3. Inference:\n   - Adaptive retrieval based on Retrieve token probability threshold\n   - Tree-decoding with segment-level beam search\n   - Soft re-ranking using weighted sum of critique token scores\n   - Enables test-time customization (e.g., prioritize citation precision vs fluency)\n\nKEY RESULTS:\n- 7B/13B models outperform ChatGPT and retrieval-augmented Llama2-chat on Open-domain QA, reasoning, fact verification\n- Significant gains in factuality and citation accuracy for long-form generation\n- PopQA: 54.9% (vs 29.3% ChatGPT), Biography FactScore: 81.2%, ASQA citation precision: 66.9%\n\nKEY INSIGHT: Training LMs to self-reflect on their generation process leads to more controllable and factual outputs without sacrificing versatility.",
+  "source": "2310.11511.pdf",
+  "tags": [
+    "Self-RAG",
+    "reflection tokens",
+    "self-reflection",
+    "controllable generation",
+    "citation accuracy"
+  ],
+  "timestamp": "2026-01-06T10:28:31.053017"
+}

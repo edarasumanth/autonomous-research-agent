@@ -1,0 +1,13 @@
+{
+  "type": "synthesis",
+  "title": "Key Themes and Evolution of Attention Mechanisms",
+  "content": "**Evolution Timeline**\n1. 1980s-2014: Bio-inspired visual attention integrated into neural networks\n2. 2015: Breakthrough year with Bahdanau (NMT), Xu (image captioning), Luong (global/local)\n3. 2017: Transformer architecture - \"Attention Is All You Need\"\n4. 2018-2020: BERT, GPT, Vision Transformer adaptations\n5. 2021-present: Efficiency innovations (linear, sparse) and expressivity improvements (higher-order)\n\n**Core Mathematical Framework**\nStandard self-attention: Attention(Q,K,V) = softmax(QK^T/√d_k)V\n- Q, K, V are linear projections of input\n- Softmax creates attention weights (probability distribution)\n- Output is weighted sum of values\n\n**Two Major Research Directions**\n\n1. **Efficiency**: Reducing O(n²) complexity\n   - Linear attention: Kernel approximations, recurrent formulations\n   - Sparse attention: Fixed patterns, block sparsity, clustering\n\n2. **Expressivity**: Enhancing representational power\n   - Multi-head attention (parallel attention with different learned projections)\n   - Higher-order attention (recursive refinement of Q, K)\n   - Relation-aware, directional, and adaptive mechanisms\n\n**Cognitive Science Connection**\n- Human attention: Selective, capacity-limited, intentional, dual-pathway (top-down + bottom-up)\n- AI attention: Data-driven, unlimited capacity, no inherent agency\n- Gap: Meaningful representations, resource-rationality, intentionality\n\n**Current Trends**\n- Hybrid models combining efficient and dense attention (Jamba, MiniMax-01, LLaMA-4)\n- In-context learning formulations (TTT, Titans)\n- Hardware-aware design (FlashAttention, chunkwise computation)",
+  "source": "Synthesis of multiple papers",
+  "tags": [
+    "attention",
+    "synthesis",
+    "evolution",
+    "trends"
+  ],
+  "timestamp": "2026-01-06T21:54:06.352050"
+}

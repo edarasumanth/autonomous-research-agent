@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Attention Mechanism in Neural Networks: Where it Comes and Where it Goes (Soydaner, 2022)",
+  "content": "This comprehensive survey traces the evolution of attention mechanisms from the late 1980s to the present. Key points:\n\n**Historical Origins (1980s-2014)**\n- Inspired by the human visual system's fovea and saccades (eye movements)\n- Early work on integrating attention into neural networks for target detection, visual recognition\n- First implementations used restricted Boltzmann machines and reinforcement learning\n\n**2015: The Golden Year**\nThree seminal papers transformed the field:\n1. **Bahdanau et al.** - Neural machine translation with attention (encoder-decoder with BiRNN)\n2. **Xu et al.** - Visual attention for image captioning (hard vs soft attention)\n3. **Luong et al.** - Global vs local attention mechanisms for NMT\n\n**The Transformer (2017)**\n- \"Attention Is All You Need\" introduced architecture based entirely on self-attention\n- Replaced recurrence/convolution with multi-head attention\n- Key innovation: Scaled dot-product attention: Attention(Q,K,V) = softmax(QK^T/√d_k)V\n- Multi-head attention allows attending to different positions simultaneously\n\n**Self-Attention Variants**\n- Relation-aware self-attention (edge representations)\n- Directional self-attention (DiSA)\n- Reinforced self-attention (ReSA) \n- Sparse sinkhorn attention\n- Adaptive attention span\n\n**Transformer Variants**\n- Universal Transformer, Image Transformer, Transformer-XL\n- BERT (bidirectional), GPT series\n- Vision Transformer (ViT)",
+  "source": "arXiv:2204.13154",
+  "tags": [
+    "attention",
+    "transformer",
+    "self-attention",
+    "survey",
+    "history"
+  ],
+  "timestamp": "2026-01-06T21:54:05.595593"
+}

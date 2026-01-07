@@ -1,0 +1,13 @@
+{
+  "topic": "Mixture of Experts in Large Language Models",
+  "background": "I want a quick overview of Mixture of Experts (MoE) architecture in LLMs.\nInterested in:\n- How MoE works (sparse gating, expert selection)\n- Key models using MoE (Mixtral, Switch Transformer)\n- Benefits and tradeoffs vs dense models",
+  "depth": "quick",
+  "max_papers": 3,
+  "time_period": "2022-2024",
+  "domains": [
+    "machine learning",
+    "NLP"
+  ],
+  "created_at": "2026-01-06T16:17:07.253131",
+  "model": "claude-sonnet-4-20250514"
+}

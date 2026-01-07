@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Systematic Review of RAG Systems (Oche et al., 2025)",
+  "content": "This comprehensive systematic review traces RAG evolution from 2017 to 2025, covering technical foundations, year-by-year progress, and enterprise applications.\n\nHISTORICAL TIMELINE:\n- 2017-2019: Pre-RAG era - DrQA, R3, ORQA with retrieve-and-read pipelines\n- 2020: Birth of RAG (Lewis et al.), DPR, REALM, KILT benchmark\n- 2021: Fusion-in-Decoder (FiD), EMDR2, improved multi-passage integration\n- 2022-2024: Advanced techniques, enterprise deployment, agentic RAG\n\nTECHNICAL COMPONENTS:\n1. Retriever Module: Dense Passage Retrieval (DPR) with bi-encoder architecture\n   - Query encoder E_q(x) and passage encoder E_p(d)\n   - Similarity via dot product, trained with contrastive loss\n   \n2. Generator Module: Seq2seq (BART, T5) conditioning on retrieved docs\n   - Early fusion: Concatenate all passages\n   - Late fusion: Marginalize over documents (RAG-Sequence, RAG-Token)\n\n3. Fusion Strategies:\n   - Marginalization (probabilistic fusion)\n   - Direct concatenation (Fusion-in-Decoder)\n   - Weighted aggregation with attention\n\nRAG FORMULA:\nP(y|x) = Σ P_ret(z_i|x) × P_gen(y|x,z_i)\n\nEXECUTION FLOW:\n1. Query encoding → 2. Document retrieval → 3. Context preparation → 4. Answer generation → 5. Fusion and output\n\nKEY MILESTONES:\n- DPR improved top-20 recall by 9-19% over BM25\n- RAG with few hundred million params surpassed 11B closed-book LMs\n- FiD allows decoder to attend to multiple documents simultaneously\n\nCHALLENGES IDENTIFIED:\n- Retrieval quality and precision\n- Privacy concerns with proprietary data\n- Integration overhead and latency\n- Hallucination despite retrieval",
+  "source": "2507.18910.pdf",
+  "tags": [
+    "RAG systematic review",
+    "historical evolution",
+    "technical components",
+    "DPR",
+    "FiD"
+  ],
+  "timestamp": "2026-01-06T10:29:58.535291"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Unleashing LLM Potential - Foundational to Advanced Prompt Methods",
+  "content": "Comprehensive review covering both foundational and advanced prompt engineering methodologies.\n\n**Foundational Methods:**\n\n1. **Giving Instructions**: Clear, detailed instructions yield better results\n2. **Be Clear and Precise**: Specific prompts reduce model uncertainty\n3. **Role-Prompting**: Assigning specific roles (historian, expert) improves contextual accuracy\n4. **Triple Quotes**: Separating prompt components for clarity\n5. **Try Several Times**: Resampling for better outputs\n6. **One-shot/Few-shot**: Providing examples (but zero-shot sometimes outperforms!)\n7. **Temperature & Top-p Settings**: Controlling randomness and diversity\n\n**Advanced Methodologies:**\n\n1. **Chain-of-Thought (CoT)**\n   - Zero-shot CoT: \"Let's think step by step\" triggers reasoning\n   - Golden CoT: Ground-truth solutions in prompt (83% vs 38% standard CoT)\n\n2. **Self-Consistency**\n   - Three steps: CoT prompt → diverse sampling → majority vote\n   - Improves arithmetic, commonsense, and symbolic reasoning\n\n3. **Generated Knowledge**\n   - Model generates relevant info first, then answers\n   - Improves logical coherence and comprehensiveness\n\n4. **Least-to-Most Prompting**\n   - Decompose complex problems into sequential subproblems\n   - Generalizes to harder problems than shown in prompts\n\n5. **Tree of Thoughts (ToT)**\n   - Multiple reasoning paths with backtracking\n   - Self-evaluation of intermediate thoughts\n\n6. **Graph of Thoughts (GoT)**\n   - Arbitrary graph representation of thoughts\n   - Allows combining multiple solution paths\n\n7. **Decomposed Prompting (DECOMP)**\n   - Modular approach with specialized handlers\n   - Superior for symbolic reasoning and multi-step QA\n\n**Key Insight:**\nZero-shot prompts can sometimes outperform few-shot prompts - examples help recall tasks, not necessarily teach new ones.",
+  "source": "Unleashing the Potential of Prompt Engineering for LLMs (arXiv:2310.14735)",
+  "tags": [
+    "foundational-methods",
+    "advanced-methods",
+    "ToT",
+    "GoT",
+    "DECOMP"
+  ],
+  "timestamp": "2026-01-06T21:08:34.830645"
+}

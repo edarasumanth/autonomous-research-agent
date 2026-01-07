@@ -1,0 +1,13 @@
+{
+  "type": "paper_summary",
+  "title": "Systematic Survey - Application-Centric Prompt Engineering",
+  "content": "This survey organizes 41+ prompt engineering techniques by application area.\n\n**Key Application Categories:**\n\n1. **New Tasks Without Extensive Training**\n   - Zero-shot Prompting: No examples needed\n   - Few-shot Prompting: Few examples provided\n\n2. **Reasoning and Logic**\n   - Chain-of-Thought (CoT): Step-by-step reasoning (90.2% on GSM8K with PaLM 540B)\n   - Auto-CoT: Automatic CoT generation with \"Let's think step by step\"\n   - Self-Consistency: Multiple reasoning paths, majority voting\n   - Tree-of-Thoughts (ToT): 74% success rate vs CoT's 4% on Game of 24\n   - Graph-of-Thoughts (GoT): Non-linear reasoning representation\n   - Chain-of-Table: Tabular reasoning for data tasks\n\n3. **Reduce Hallucination**\n   - RAG (Retrieval Augmented Generation): External knowledge integration\n   - ReAct: Reasoning + Action combined\n   - Chain-of-Verification (CoVe): 4-step verification process\n   - Chain-of-Note (CoN): Document relevance evaluation\n   - Chain-of-Knowledge (CoK): Systematic evidence gathering\n\n4. **Code Generation**\n   - Scratchpad Prompting: Intermediate steps for code\n   - Program-of-Thoughts (PoT): External interpreter for computations\n   - Chain-of-Code (CoC): 84% accuracy on BIG-Bench Hard\n\n5. **Optimization**\n   - Automatic Prompt Engineer (APE): Auto prompt generation\n   - OPRO: LLMs as optimizers\n\n6. **Managing Emotions**\n   - Emotion Prompting: 8% improvement in instruction induction, 115% on BIG-Bench\n\n**Notable Performance Improvements:**\n- Self-Consistency + CoT: 17.9% improvement on GSM8K\n- ToT vs CoT: 74% vs 4% on Game of 24\n- CoVe: Systematic hallucination reduction",
+  "source": "A Systematic Survey of Prompt Engineering in LLMs: Techniques and Applications (arXiv:2402.07927)",
+  "tags": [
+    "application-focused",
+    "reasoning",
+    "hallucination-reduction",
+    "code-generation"
+  ],
+  "timestamp": "2026-01-06T21:08:34.742446"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Corrective RAG (CRAG) - Yan et al., 2024",
+  "content": "CRAG proposes corrective strategies to improve RAG robustness when retrieval returns inaccurate results.\n\nKEY COMPONENTS:\n1. Retrieval Evaluator:\n   - Lightweight T5-large model (0.77B parameters) to assess document relevance\n   - Significantly outperforms ChatGPT (84.3% vs 64.7% few-shot) for retrieval evaluation\n   - Fine-tuned on relevance signals from existing datasets (e.g., PopQA wiki titles)\n\n2. Action Trigger System:\n   - CORRECT: Confidence > upper threshold → refine retrieved documents\n   - INCORRECT: Confidence < lower threshold → discard documents, use web search\n   - AMBIGUOUS: In-between → combine both internal and external knowledge\n\n3. Knowledge Refinement (Decompose-then-Recompose):\n   - Segment documents into knowledge strips\n   - Filter irrelevant strips using retrieval evaluator\n   - Recompose relevant strips into refined internal knowledge\n\n4. Web Search Integration:\n   - Query rewriting (using ChatGPT) for effective web searches\n   - External knowledge selection from authoritative sources (Wikipedia preferred)\n   - Complements limited static corpora with dynamic web content\n\nKEY RESULTS:\n- CRAG improves RAG by 7.0% on PopQA, 14.9% FactScore on Biography, 36.6% on PubHealth\n- Self-CRAG outperforms Self-RAG by 6.9% on PopQA, 5.0% FactScore on Biography\n- Plug-and-play: Works with any RAG-based approach\n- Robust to retrieval quality degradation\n\nKEY INSIGHT: Self-correction mechanisms that evaluate retrieval quality and trigger appropriate knowledge retrieval actions significantly improve generation robustness.",
+  "source": "2401.15884.pdf",
+  "tags": [
+    "CRAG",
+    "corrective retrieval",
+    "retrieval evaluation",
+    "web search",
+    "knowledge refinement"
+  ],
+  "timestamp": "2026-01-06T10:28:31.121609"
+}

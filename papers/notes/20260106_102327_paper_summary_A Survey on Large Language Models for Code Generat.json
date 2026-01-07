@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "A Survey on Large Language Models for Code Generation",
+  "content": "Comprehensive 2024 survey covering LLMs for code generation (NL2Code task). Key insights:\n\n**Code LLM Landscape:**\n- General-purpose LLMs: ChatGPT, GPT-4, LLaMA, Claude 3\n- Code-specific LLMs: StarCoder, Code Llama, DeepSeek-Coder, CodeGemma, CodeGen, CodeT5\n\n**Architectures:**\n- Encoder-only (CodeBERT): suitable for code comprehension tasks\n- Decoder-only (StarCoder, CodeGen): excel in generation tasks like code generation, translation\n- Encoder-decoder (CodeT5): accommodate both understanding and generation\n\n**Training Pipeline (4 stages):**\n1. Pre-training on code corpora\n2. (Optional) Continual pre-training\n3. Supervised Fine-tuning (SFT) with instruction data\n4. (Optional) Alignment with human preference (RLHF)\n\n**Key Datasets:**\n- Pre-training: GitHub repositories, The Stack, CodeParrot\n- Instruction tuning: Self-instruct data, Evol-Instruct\n\n**Advanced Topics Covered:**\n- Data curation & synthesis\n- Instruction tuning and alignment with feedback\n- Prompt engineering techniques\n- Repository-level code generation\n- Retrieval-augmented code generation\n- Autonomous coding agents\n- LLM-as-a-Judge for evaluation\n\n**Historical Evolution:**\n- 2021: Codex, GPT-Neo, PyMT5\n- 2022: AlphaCode, CodeGen, InCoder, StarCoder foundations\n- 2023: Code Llama, WizardCoder, DeepSeek-Coder, phi-1\n- 2024: StarCoder2, CodeGemma, Devin, OpenDevin",
+  "source": "2406.00515.pdf",
+  "tags": [
+    "survey",
+    "code-llm",
+    "architectures",
+    "training",
+    "comprehensive"
+  ],
+  "timestamp": "2026-01-06T10:23:27.986207"
+}

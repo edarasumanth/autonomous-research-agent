@@ -1,0 +1,15 @@
+{
+  "type": "paper_summary",
+  "title": "RAG Survey: Comprehensive Review (Gao et al., 2024)",
+  "content": "This comprehensive survey categorizes RAG into three paradigms: Naive RAG, Advanced RAG, and Modular RAG.\n\nTHREE RAG PARADIGMS:\n1. Naive RAG: Traditional indexing-retrieval-generation pipeline (\"Retrieve-Read\")\n   - Challenges: retrieval precision/recall, hallucination, irrelevant context integration\n\n2. Advanced RAG: Pre-retrieval and post-retrieval optimizations\n   - Pre-retrieval: query rewriting, expansion, transformation, routing\n   - Post-retrieval: re-ranking, context compression, selection\n\n3. Modular RAG: Flexible component-based architecture\n   - New modules: Search, RAG-Fusion, Memory, Routing, Predict, Task Adapter\n   - Patterns: Rewrite-Retrieve-Read, Generate-Read, iterative/adaptive retrieval\n\nKEY TECHNICAL COMPONENTS:\n\nRETRIEVAL:\n- Sources: Unstructured (text), Semi-structured (PDF), Structured (KG), LLM-generated content\n- Granularity: Token → Phrase → Sentence → Proposition → Chunk → Document\n- Indexing: Chunking strategies, metadata, hierarchical/KG indexes\n- Query optimization: Multi-query expansion, sub-queries, HyDE, query rewriting\n- Embeddings: Sparse (BM25) + Dense (BERT-based), hybrid retrieval\n- Fine-tuning embedders with LLM supervision (REPLUG, LLM-Embedder)\n\nGENERATION:\n- Context curation: Re-ranking (Cohere, bge-reranker), compression (LLMLingua)\n- LLM fine-tuning: Domain adaptation, RLHF alignment, knowledge distillation\n\nAUGMENTATION PROCESSES:\n- Iterative retrieval: Multiple retrieval cycles (ITER-RETGEN)\n- Recursive retrieval: Hierarchical processing (RAPTOR)\n- Adaptive retrieval: On-demand retrieval based on need (FLARE, Self-RAG)\n\nEVALUATION:\n- Metrics: Retrieval quality (context precision/recall), generation quality (faithfulness, relevance)\n- Benchmarks: RGB, RECALL, CRUD-RAG\n- Tools: RAGAS, ARES, TruLens",
+  "source": "2312.10997.pdf",
+  "tags": [
+    "RAG survey",
+    "taxonomy",
+    "retrieval",
+    "generation",
+    "augmentation",
+    "evaluation"
+  ],
+  "timestamp": "2026-01-06T10:29:12.724206"
+}

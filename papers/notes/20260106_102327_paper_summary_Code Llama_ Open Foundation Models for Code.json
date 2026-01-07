@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Code Llama: Open Foundation Models for Code",
+  "content": "Code Llama is a family of LLMs for code based on Llama 2, released by Meta AI in 2023. Key features include:\n\n**Architecture & Variants:**\n- Three main variants: Code Llama (foundation), Code Llama - Python (specialized), Code Llama - Instruct (instruction-following)\n- Four sizes: 7B, 13B, 34B, and 70B parameters\n- Built on Llama 2 foundation through code-specialized training\n\n**Training Approach:**\n- Initialized from Llama 2 (pretrained on 2T tokens including 80B code tokens)\n- Code Llama trained on additional 500B tokens (85% code, 8% NL related to code, 7% general NL)\n- Code Llama - Python: additional 100B tokens (75% Python)\n- Infilling training with fill-in-the-middle (FIM) objective for 7B, 13B, 70B models\n- Long context fine-tuning (LCFT) extends context from 4,096 to 100,000 tokens\n\n**Key Results:**\n- HumanEval pass@1: 33.5% (7B), 36.0% (13B), 48.8% (34B), 53.0% (70B) for base Code Llama\n- Code Llama - Python 7B outperforms Llama 2 70B on coding benchmarks\n- Code Llama - Instruct 70B achieves 67.8% on HumanEval\n- State-of-the-art among open models on MultiPL-E (multiple programming languages)\n\n**Self-Instruct for Training:**\n- Generated 62,000 interview-style programming questions using Llama 2 70B\n- Used Code Llama 7B to generate unit tests and solutions\n- Filtered by execution feedback to create ~14,000 high-quality triplets",
+  "source": "2308.12950.pdf",
+  "tags": [
+    "code-llama",
+    "architecture",
+    "training",
+    "meta-ai",
+    "open-source"
+  ],
+  "timestamp": "2026-01-06T10:23:27.916800"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Mixtral of Experts (Mixtral 8x7B)",
+  "content": "**Paper**: Mixtral of Experts (2024)\n**Authors**: Mistral AI Team\n\n**Key Architecture**:\n- Sparse Mixture of Experts (SMoE) language model\n- Same architecture as Mistral 7B, but each layer has 8 feedforward blocks (experts)\n- For every token, a router network selects 2 experts (Top-2 routing)\n- Each token accesses 47B parameters but only uses 13B active parameters during inference\n- Uses SwiGLU architecture for expert function\n- Trained with 32k context size\n\n**Gating Mechanism**:\n- Simple and performant: G(x) = Softmax(TopK(x·Wg))\n- Top-K (K=2) gating selects two experts per token\n- Weights given by softmax over top-K logits of a linear layer\n- Different experts can be selected at each timestep\n\n**Performance Results**:\n- Outperforms or matches Llama 2 70B and GPT-3.5 on most benchmarks\n- Uses only 13B active parameters (5x fewer than Llama 2 70B)\n- Superior in mathematics, code generation, and multilingual tasks\n- Mixtral-Instruct outperforms GPT-3.5 Turbo, Claude-2.1, Gemini Pro on human benchmarks\n\n**Routing Analysis Findings**:\n- No obvious patterns in expert assignment based on topic/domain\n- Router exhibits structured syntactic behavior rather than domain specialization\n- Consecutive tokens often assigned to same experts (positional locality)\n- Expert choice appears aligned with syntax rather than domain\n\n**Key Insight**: The MoE approach enables significant parameter scaling while controlling inference cost, since only a fraction of parameters are used per token.",
+  "source": "https://arxiv.org/pdf/2401.04088",
+  "tags": [
+    "MoE",
+    "Mixtral",
+    "sparse-gating",
+    "top-k-routing",
+    "LLM-architecture"
+  ],
+  "timestamp": "2026-01-06T16:19:04.097453"
+}

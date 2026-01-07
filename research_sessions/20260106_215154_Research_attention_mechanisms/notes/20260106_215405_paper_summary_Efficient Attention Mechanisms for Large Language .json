@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Efficient Attention Mechanisms for Large Language Models: A Survey (Sun et al., 2025)",
+  "content": "This survey addresses the fundamental challenge of O(n²) complexity in self-attention for long sequences.\n\n**Linear Attention Methods**\n\n1. **Kernelized Linear Attention**\n   - Approximates softmax kernel with feature mappings: exp(q·k) ≈ φ(q)·φ(k)\n   - Examples: Linear Transformer, Performer (FAVOR+), RFA, cosFormer\n   - Reduces complexity from O(L²d) to O(Ld²)\n\n2. **Linear Attention with Forgetting Mechanism**\n   - Data-independent decay: RetNet, Eagle, H3 (fixed decay factor γ)\n   - Data-dependent decay: Mamba, GLA, xLSTM (adaptive gating)\n\n3. **Linear Attention as In-Context Learners**\n   - DeltaNet: Uses delta rule for online memory updates\n   - TTT (Test-Time Training): Meta-learning objective during inference\n   - Titans: Adds momentum to memory updates\n\n**Sparse Attention Methods**\n\n1. **Fixed-pattern Sparse Attention**\n   - Local window attention (Sparse Transformer, GPT-3)\n   - StreamingLLM: Attention sink tokens + sliding window\n\n2. **Block Sparse Attention**\n   - MInference, Quest, MoBA\n   - Routing-based block sparsity (SeerAttention, NSA)\n\n3. **Clustering Attention**\n   - RetrievalAttention, ClusterKV, MagicPIG\n   - Uses k-means or LSH for content-based grouping\n\n**Hardware Implementation**\n- Parallel, recurrent, and chunkwise representations\n- Trade-offs between training efficiency and inference speed",
+  "source": "arXiv:2507.19595",
+  "tags": [
+    "attention",
+    "efficiency",
+    "linear attention",
+    "sparse attention",
+    "LLM"
+  ],
+  "timestamp": "2026-01-06T21:54:05.971730"
+}

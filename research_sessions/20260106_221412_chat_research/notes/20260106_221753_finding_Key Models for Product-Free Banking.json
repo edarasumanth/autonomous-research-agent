@@ -1,0 +1,14 @@
+{
+  "type": "finding",
+  "title": "Key Models for Product-Free Banking",
+  "content": "Based on research, \"product-free banking\" relates to several emerging models:\n\n1. **Banking-as-a-Service (BaaS)**: Licensed banks provide banking infrastructure to other businesses via APIs. The bank becomes an invisible infrastructure provider while non-banks offer customer-facing products.\n\n2. **Embedded Finance**: Financial services integrated into non-financial platforms (e.g., buy-now-pay-later in e-commerce). Banks provide the \"rails\" but not the products themselves.\n\n3. **Open Banking / Platform Banking**: Banks open their infrastructure via APIs, becoming platforms that aggregate third-party services rather than creating their own products.\n\n4. **Unbundling and Rebundling**: Traditional banking functions are separated (unbundled), with specialized FinTechs handling specific services. Banks may then \"rebundle\" by orchestrating these services.\n\n5. **White-Label Banking**: Banks provide complete banking infrastructure under other brands' names.\n\nCORE CONCEPT: In all these models, banks shift from being product creators to being infrastructure/platform providers - hence \"product-free\" in the sense that they don't originate the customer-facing products.",
+  "source": "Synthesis from multiple search results",
+  "tags": [
+    "BaaS",
+    "embedded finance",
+    "platform banking",
+    "unbundling",
+    "infrastructure banking"
+  ],
+  "timestamp": "2026-01-06T22:17:53.627307"
+}

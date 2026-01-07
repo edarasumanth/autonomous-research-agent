@@ -1,0 +1,15 @@
+{
+  "type": "paper_summary",
+  "title": "Banking Ecosystem: What Do Retail Clients Expect (Au et al., 2022)",
+  "content": "This paper examines how traditional banks can create new revenue streams by going \"beyond banking\" - offering products and services outside their traditional portfolio.\n\nKEY CONCEPTS:\n- \"Beyond Banking\": Banks seeking new revenues beyond classic financial products/services\n- \"Banking Ecosystem\": Integration of third-party providers into a bank's offering\n- \"Open Banking\": Using API technology to integrate FinTech solutions\n\nCUSTOMER NEEDS IDENTIFIED (German retail clients):\n1. Digital vouchers (55% interested)\n2. Deposit marketplace platforms (51%)\n3. Digital identity management services (49%)\n4. Digital tax services (48%)\n5. Social trading/investment guidance (48%)\n\nKEY FINDING: Financial products/services are more relevant to customers than non-financial offers, but non-financial services (like digital identity) still rank highly.\n\nSTRATEGIC IMPLICATIONS:\n- Banks can integrate FinTechs rather than building solutions organically\n- Commission-based revenue models (like Uber/Airbnb) are applicable\n- Banks' reputation for security can be leveraged for new services\n- German banks show ~1% RoE vs much higher for US/Asian banks, driving need for new revenue",
+  "source": "Au, C-D., Krahnhof, P., Klingenberger, L. (2022). Banking Ecosystem: What Do Retail Clients Expect from the Modern Financial Services Industry? Universal Journal of Accounting and Finance 10(2): 498-508",
+  "tags": [
+    "banking ecosystem",
+    "beyond banking",
+    "open banking",
+    "API economy",
+    "fintech integration",
+    "product-free banking"
+  ],
+  "timestamp": "2026-01-06T22:17:03.670211"
+}

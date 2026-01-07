@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Nexus: Higher-Order Attention Mechanisms in Transformers (Chen et al., 2024)",
+  "content": "This paper addresses the low-rank bottleneck in standard attention by introducing higher-order attention mechanisms.\n\n**Problem: Linear Bottleneck**\n- Standard attention: A = softmax(QK^T/√d_k) only captures pairwise (first-order) interactions\n- When d_k < n, attention suffers from rank collapse\n- Cannot express arbitrary attention patterns or complex hierarchical relationships\n\n**Solution: Higher-Order Attention (Nexus)**\n- Recursively refines Q and K through nested self-attention loops\n- H-Attention(X) = Attention(Attention_q(X), Attention_k(X), V)\n- Allows \"pre-reasoning\" step before final attention computation\n\n**Recursive Extension**\n- Can extend to m-th order: H^m-Attention recursively processes Q and K\n- Time complexity: O(2^m · n² · d_k)\n- Parameter complexity: O(1) with weight sharing strategy\n\n**Key Results**\n- Outperforms standard Transformers on reasoning benchmarks (MATH-500, AIME24, GPQA)\n- Can retrofit existing models (Qwen2.5) during fine-tuning\n- Inner K-Attention acts as \"semantic highlighter\" identifying globally relevant tokens\n\n**Theoretical Contribution**\n- Proves standard linear Q,K projections cannot represent even rank-1 log-attention matrices\n- Higher-order mechanism breaks this limitation through nonlinear mappings",
+  "source": "arXiv:2512.03377",
+  "tags": [
+    "attention",
+    "higher-order",
+    "reasoning",
+    "transformer",
+    "Nexus"
+  ],
+  "timestamp": "2026-01-06T21:54:06.176774"
+}

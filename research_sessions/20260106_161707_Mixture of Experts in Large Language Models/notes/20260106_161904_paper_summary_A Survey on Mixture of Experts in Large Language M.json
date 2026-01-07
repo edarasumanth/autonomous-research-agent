@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "A Survey on Mixture of Experts in Large Language Models",
+  "content": "**Paper**: A Survey on Mixture of Experts in Large Language Models (2024)\n**Authors**: Cai et al.\n\n**MoE Architecture Overview**:\n- Each MoE layer consists of N expert networks {f1,...,fN} and a gating network G\n- Gating network (linear-softmax) directs input to appropriate experts\n- MoE layer replaces Feed-Forward Network (FFN) in Transformer blocks\n- Position: after self-attention sub-layer\n\n**Dense vs Sparse MoE**:\n- Dense MoE: Activates ALL experts for each input (higher accuracy, high compute)\n- Sparse MoE: Activates only top-k experts (computational efficiency, maintains performance)\n- Sparse MoE formula: G(x) = softmax(TopK(g(x) + noise, k))\n\n**Key Gating Strategies**:\n1. Token-Choice Gating: Each token selects top-k experts (k=1 or k=2 common)\n2. Expert-Choice Gating: Each expert selects top-k tokens (ensures load balance)\n3. Soft MoE: Fully differentiable via token merging or expert merging\n\n**Load Balancing**:\n- Critical challenge: uneven workload distribution across experts\n- Auxiliary loss function promotes even token distribution: L_load-balancing = N * Σ(Di * Pi)\n- Expert capacity limits define max tokens per expert\n\n**Key Models Timeline**:\n- GShard (2020): First large-scale MoE with top-2 routing\n- Switch Transformer (2021): Simplified to top-1 routing, scaled to trillion parameters\n- Mixtral-8x7B (2024): State-of-art open-source MoE\n- DeepSeekMoE, DBRX, Jamba (2024): Advanced fine-grained expert designs\n\n**Benefits vs Tradeoffs**:\n- Benefits: Scale parameters without proportional compute increase, specialized experts\n- Tradeoffs: Load imbalance, routing complexity, memory costs for all expert parameters",
+  "source": "https://arxiv.org/pdf/2407.06204",
+  "tags": [
+    "MoE",
+    "survey",
+    "gating-functions",
+    "load-balancing",
+    "sparse-activation"
+  ],
+  "timestamp": "2026-01-06T16:19:04.170132"
+}

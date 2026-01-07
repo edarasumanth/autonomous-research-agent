@@ -1,0 +1,12 @@
+{
+  "type": "finding",
+  "title": "Key Code LLM Models and Performance",
+  "content": "Performance comparison on HumanEval benchmark (pass@1):\n- GPT-4: 67.0%\n- Code Llama - Instruct 70B: 67.8%\n- Code Llama - Python 70B: 57.3%\n- Code Llama 70B: 53.0%\n- StarCoder (15.5B): 33.6%\n- CodeGen (16.1B): up to 75% pass@100\n- GPT-3.5/ChatGPT: 48.1% (up to 94% pass@100)\n- Codex (12B): 72.31% pass@100\n\nKey open-source models:\n- Code Llama (Meta): 7B-70B, supports infilling, 100k context\n- StarCoder (BigCode): 15.5B, trained on The Stack\n- DeepSeek-Coder: specialized for code tasks\n- CodeGen (Salesforce): multi-turn program synthesis\n- WizardCoder: instruction-tuned with Evol-Instruct",
+  "source": "Multiple papers",
+  "tags": [
+    "performance",
+    "comparison",
+    "models"
+  ],
+  "timestamp": "2026-01-06T10:23:28.096228"
+}

@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "Contriever: Unsupervised Dense Retrieval (Izacard et al., 2022)",
+  "content": "Contriever demonstrates that contrastive learning can train effective dense retrievers without any supervision, achieving competitive performance with BM25.\n\nKEY APPROACH:\n- Uses MoCo (Momentum Contrast) framework with dual-encoder architecture (BERT-base)\n- Positive pairs: Independent random cropping of document text (better than ICT)\n- Training on Wikipedia + CCNet data\n- Representation: Average pooling of last layer hidden states\n\nCONTRASTIVE LEARNING:\n- InfoNCE loss to discriminate positive/negative pairs\n- MoCo allows scaling to large negatives without huge batch sizes\n- Momentum encoder for keys, updated via exponential moving average\n- Queue stores negative examples across batches (up to 131K negatives)\n\nKEY FINDINGS:\n1. Cropping outperforms Inverse Cloze Task (ICT) for generating positive pairs\n2. More negatives generally improve performance, especially in unsupervised setting\n3. On BEIR benchmark: outperforms BM25 on 11/15 datasets for Recall@100\n4. When used as pre-training before MS MARCO fine-tuning: SOTA on BEIR\n\nMULTILINGUAL:\n- mContriever trained on 29 languages\n- Strong cross-lingual retrieval (e.g., Arabic queries → English docs)\n- Fine-tuning on English MS MARCO improves all languages\n\nRESULTS:\n- NaturalQuestions R@100: 82.1% (vs BM25: 78.3%)\n- TriviaQA R@100: 83.2% (matching BM25)\n- After MS MARCO fine-tuning: BEIR nDCG@10 avg 46.6% (SOTA for dense bi-encoders)",
+  "source": "2112.09118.pdf",
+  "tags": [
+    "Contriever",
+    "unsupervised retrieval",
+    "contrastive learning",
+    "dense retrieval",
+    "MoCo"
+  ],
+  "timestamp": "2026-01-06T10:29:58.461557"
+}

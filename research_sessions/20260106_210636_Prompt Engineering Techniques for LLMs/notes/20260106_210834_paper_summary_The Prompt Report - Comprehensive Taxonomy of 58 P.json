@@ -1,0 +1,14 @@
+{
+  "type": "paper_summary",
+  "title": "The Prompt Report - Comprehensive Taxonomy of 58 Prompting Techniques",
+  "content": "This is the most comprehensive survey on prompt engineering to date (2024), presenting:\n\n**Key Contributions:**\n- 33 vocabulary terms for prompting\n- Taxonomy of 58 LLM prompting techniques\n- 40 techniques for other modalities (multimodal)\n\n**Major Technique Categories:**\n1. **In-Context Learning (ICL)**: Learning from exemplars/instructions without weight updates\n2. **Thought Generation**: Chain-of-Thought and variations\n3. **Decomposition**: Breaking complex problems into simpler sub-questions\n4. **Ensembling**: Using multiple prompts and aggregating responses\n5. **Self-Criticism**: LLMs critiquing their own outputs\n\n**Key Prompting Techniques Identified:**\n- Zero-Shot & Few-Shot Prompting\n- Chain-of-Thought (CoT) and Zero-Shot-CoT\n- Tree-of-Thought (ToT)\n- Self-Consistency\n- Role Prompting\n- Emotion Prompting\n- RAG (Retrieval Augmented Generation)\n\n**Important Design Decisions for Few-Shot:**\n1. Exemplar Quantity - more exemplars generally improve performance\n2. Exemplar Ordering - order significantly affects results (can cause 50% to 90%+ accuracy variance)\n3. Label Distribution - balanced labels reduce bias\n4. Label Quality - accuracy of labels matters\n5. Format - common formats from training data work better\n6. Similarity - selecting similar exemplars to test sample helps\n\n**Prompt Components:**\n- Directive (instruction/question)\n- Examples/Exemplars\n- Output Formatting\n- Style Instructions\n- Role/Persona\n- Additional Information/Context",
+  "source": "The Prompt Report: A Systematic Survey of Prompt Engineering Techniques (arXiv:2406.06608)",
+  "tags": [
+    "taxonomy",
+    "comprehensive-survey",
+    "prompting-techniques",
+    "ICL",
+    "CoT"
+  ],
+  "timestamp": "2026-01-06T21:08:34.612387"
+}

@@ -1,0 +1,15 @@
+{
+  "type": "paper_summary",
+  "title": "RAG: Retrieval-Augmented Generation (Lewis et al., 2020)",
+  "content": "The foundational RAG paper by Lewis et al. (2020) introduces a general-purpose fine-tuning approach that combines pre-trained parametric memory (BART seq2seq model) with non-parametric memory (dense vector index of Wikipedia accessed via DPR retriever).\n\nKEY ARCHITECTURE:\n- Retriever: Dense Passage Retriever (DPR) using bi-encoder with BERT, returns top-K documents via Maximum Inner Product Search (MIPS)\n- Generator: BART-large (400M parameters) that conditions on retrieved documents\n- Two formulations: RAG-Sequence (same document for entire sequence) and RAG-Token (different documents per token)\n\nTRAINING: Joint end-to-end training minimizing negative marginal log-likelihood, treating retrieved documents as latent variables. Document encoder fixed, only query encoder and BART generator fine-tuned.\n\nKEY RESULTS:\n- State-of-the-art on Natural Questions (44.5 EM), TriviaQA (56.8/68.0), WebQuestions (45.2), CuratedTrec (52.2)\n- More factual, specific, and diverse generation than BART alone\n- 11.8% accuracy on questions where answer not in retrieved docs (parametric knowledge)\n- Index hot-swapping enables knowledge updates without retraining\n\nINSIGHTS:\n- Combines flexibility of closed-book approaches with performance of retrieval-based methods\n- Parametric and non-parametric memories work together synergistically\n- No re-ranker or extractive reader needed for SOTA performance",
+  "source": "2005.11401.pdf",
+  "tags": [
+    "RAG",
+    "foundational",
+    "architecture",
+    "BART",
+    "DPR",
+    "seq2seq"
+  ],
+  "timestamp": "2026-01-06T10:27:49.467736"
+}

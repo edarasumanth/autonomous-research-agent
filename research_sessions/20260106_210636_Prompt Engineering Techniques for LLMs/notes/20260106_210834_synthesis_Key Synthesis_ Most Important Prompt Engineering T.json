@@ -1,0 +1,12 @@
+{
+  "type": "synthesis",
+  "title": "Key Synthesis: Most Important Prompt Engineering Techniques",
+  "content": "**Top Prompt Engineering Techniques Across All Papers:**\n\n1. **Chain-of-Thought (CoT)** - Most widely discussed technique\n   - Dramatically improves reasoning tasks\n   - Zero-shot variant: Just add \"Let's think step by step\"\n   - 90.2% accuracy on math benchmarks\n\n2. **Self-Consistency** - Ensemble approach\n   - Generate multiple reasoning paths\n   - Take majority vote\n   - 17.9% improvement on GSM8K\n\n3. **Tree/Graph of Thoughts** - Advanced reasoning structures\n   - Explore multiple solution paths\n   - Allow backtracking and evaluation\n   - 74% vs 4% (CoT) on complex tasks\n\n4. **Few-Shot Learning** - Fundamental technique\n   - Provide examples in prompt\n   - Order and selection matter significantly\n\n5. **RAG** - Reducing hallucinations\n   - Combine LLM with external knowledge retrieval\n   - Critical for factual accuracy\n\n**Key Principles:**\n- Be clear and specific in instructions\n- Use appropriate prompting technique for task complexity\n- Consider combining techniques (e.g., CoT + Self-Consistency)\n- More advanced ≠ always better (zero-shot sometimes wins)",
+  "source": "Synthesis of three survey papers",
+  "tags": [
+    "synthesis",
+    "key-techniques",
+    "best-practices"
+  ],
+  "timestamp": "2026-01-06T21:08:34.944218"
+}
