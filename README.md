@@ -1,5 +1,9 @@
 # Autonomous Research Agent
 
+[![CI](https://github.com/edarasumanth/autonomous-research-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/edarasumanth/autonomous-research-agent/actions/workflows/ci.yml)
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 An AI-powered research assistant built with the Claude Agent SDK. This application autonomously searches for academic papers, downloads PDFs, analyzes content, and generates comprehensive research reports.
 
 ## Features
@@ -84,7 +88,7 @@ scripts\stop.bat local
 ## Project Structure
 
 ```
-My First Project/
+autonomous-research-agent/
 ├── streamlit_app.py         # Web interface
 ├── chat_research_agent.py   # Chat-based research agent
 ├── web_research_agent.py    # Structured research agent
