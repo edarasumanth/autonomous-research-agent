@@ -82,6 +82,13 @@ COPY --from=builder /opt/venv /opt/venv
 # Copy application code
 COPY --chown=appuser:appgroup src/ ./src/
 COPY --chown=appuser:appgroup streamlit_app.py .
+COPY --chown=appuser:appgroup web_research_agent.py .
+COPY --chown=appuser:appgroup web_research_tools.py .
+COPY --chown=appuser:appgroup chat_research_agent.py .
+COPY --chown=appuser:appgroup autonomous_agent.py .
+COPY --chown=appuser:appgroup autonomous_tools.py .
+COPY --chown=appuser:appgroup research_agent.py .
+COPY --chown=appuser:appgroup tools.py .
 COPY --chown=appuser:appgroup .env.example .
 
 # Create directories for data persistence
