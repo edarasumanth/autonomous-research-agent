@@ -7,7 +7,7 @@
 # -----------------------------------------------------------------------------
 # Stage 1: Builder - Install dependencies and build the package
 # -----------------------------------------------------------------------------
-FROM python:3.11-slim AS builder
+FROM python:3.14-slim AS builder
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -38,7 +38,7 @@ RUN pip install .
 # -----------------------------------------------------------------------------
 # Stage 2: Runtime - Minimal production image
 # -----------------------------------------------------------------------------
-FROM python:3.11-slim AS runtime
+FROM python:3.14-slim AS runtime
 
 LABEL maintainer="Research Agent Team" \
       version="1.0.0" \

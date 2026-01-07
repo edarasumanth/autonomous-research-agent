@@ -4,7 +4,7 @@
 # Development image with hot reload and debugging support
 # =============================================================================
 
-FROM python:3.11-slim
+FROM python:3.14-slim
 
 LABEL maintainer="Research Agent Team" \
       version="1.0.0-dev" \
