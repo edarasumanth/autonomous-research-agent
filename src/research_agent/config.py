@@ -38,9 +38,7 @@ class Settings:
     debug: bool = field(default_factory=lambda: os.getenv("DEBUG", "false").lower() == "true")
 
     # Streamlit Settings
-    streamlit_port: int = field(
-        default_factory=lambda: int(os.getenv("STREAMLIT_PORT", "8501"))
-    )
+    streamlit_port: int = field(default_factory=lambda: int(os.getenv("STREAMLIT_PORT", "8501")))
     streamlit_host: str = field(default_factory=lambda: os.getenv("STREAMLIT_HOST", "0.0.0.0"))
 
     # Research Settings

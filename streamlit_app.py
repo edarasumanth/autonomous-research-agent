@@ -30,6 +30,7 @@ import traceback
 from datetime import datetime
 
 from dotenv import load_dotenv
+
 load_dotenv()
 
 from web_research_agent import (
@@ -57,7 +58,8 @@ st.set_page_config(
 )
 
 # Custom CSS - Enhanced UI
-st.markdown("""
+st.markdown(
+    """
 <style>
     /* Main container */
     .main .block-container {
@@ -236,7 +238,9 @@ st.markdown("""
         box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
     }
 </style>
-""", unsafe_allow_html=True)
+""",
+    unsafe_allow_html=True,
+)
 
 
 # =============================================================================
@@ -268,6 +272,7 @@ if "chat_model" not in st.session_state:
 # =============================================================================
 # Helper Functions
 # =============================================================================
+
 
 def clear_chat():
     """Clear chat history and start fresh."""
@@ -327,7 +332,14 @@ with st.sidebar:
     sessions = list_research_sessions()
 
     # Filter to show only meaningful sessions (with metadata or completion)
-    valid_sessions = [s for s in sessions if s.get("metadata") or s.get("completion") or s.get("has_report") or len(s.get("pdfs", [])) > 0]
+    valid_sessions = [
+        s
+        for s in sessions
+        if s.get("metadata")
+        or s.get("completion")
+        or s.get("has_report")
+        or len(s.get("pdfs", [])) > 0
+    ]
 
     if not valid_sessions:
         st.caption("✨ No research sessions yet")
@@ -396,7 +408,9 @@ with st.sidebar:
                 status = "⏳"  # In progress
 
             # Model info
-            model = session.get("metadata", {}).get("model", "") or session.get("completion", {}).get("model", "")
+            model = session.get("metadata", {}).get("model", "") or session.get(
+                "completion", {}
+            ).get("model", "")
             model_short = ""
             if model:
                 if "opus" in model.lower():
@@ -435,19 +449,20 @@ with st.sidebar:
                 st.rerun()
 
 
-
 # =============================================================================
 # Main Content Area
 # =============================================================================
 
 # Header
-st.markdown("""
+st.markdown(
+    """
 <div class="main-header">
     <h1>🔬 Autonomous Research Agent</h1>
     <p>AI-powered research assistant • Chat naturally or use structured forms</p>
 </div>
-""", unsafe_allow_html=True)
-
+""",
+    unsafe_allow_html=True,
+)
 
 
 # =============================================================================
@@ -460,58 +475,73 @@ if st.session_state.current_view == "chat":
     # Model selector row with descriptions
     col1, col2 = st.columns([3, 1])
     with col1:
-        st.caption("Ask me to research any topic. I'll search for papers, analyze them, and share my findings.")
+        st.caption(
+            "Ask me to research any topic. I'll search for papers, analyze them, and share my findings."
+        )
     with col2:
         model_options = {
             "claude-sonnet-4-20250514": "⚡ Sonnet (Fast)",
             "claude-opus-4-20250514": "🧠 Opus (Best)",
-            "claude-haiku-3-5-20241022": "🚀 Haiku (Quick)"
+            "claude-haiku-3-5-20241022": "🚀 Haiku (Quick)",
         }
         selected_display = st.selectbox(
             "Model",
             list(model_options.values()),
             index=list(model_options.keys()).index(st.session_state.chat_model),
             key="chat_model_selector",
-            label_visibility="collapsed"
+            label_visibility="collapsed",
         )
         # Map back to model ID
-        st.session_state.chat_model = list(model_options.keys())[list(model_options.values()).index(selected_display)]
+        st.session_state.chat_model = list(model_options.keys())[
+            list(model_options.values()).index(selected_display)
+        ]
 
     # Welcome section for new users (show when no messages)
     if not st.session_state.chat_messages:
         st.markdown("---")
 
         # Welcome card
-        st.markdown("""
+        st.markdown(
+            """
         <div style="background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%); padding: 1.5rem; border-radius: 12px; margin-bottom: 1rem;">
             <h4 style="margin: 0 0 0.5rem 0;">👋 Welcome to the Research Agent!</h4>
             <p style="margin: 0; color: #555;">I can help you explore academic topics by searching papers, analyzing PDFs, and generating comprehensive reports.</p>
         </div>
-        """, unsafe_allow_html=True)
+        """,
+            unsafe_allow_html=True,
+        )
 
         # How it works
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.markdown("""
+            st.markdown(
+                """
             **🔍 Step 1: Ask**
 
             Type your research topic or question in the chat below.
-            """)
+            """
+            )
         with col2:
-            st.markdown("""
+            st.markdown(
+                """
             **📚 Step 2: Research**
 
             I'll search for papers, download PDFs, and analyze the content.
-            """)
+            """
+            )
         with col3:
-            st.markdown("""
+            st.markdown(
+                """
             **📄 Step 3: Report**
 
             Get a comprehensive report with key findings and sources.
-            """)
+            """
+            )
 
         st.markdown("---")
-        st.info("💡 **Tip:** Be specific! Instead of \"AI\", try \"Recent advances in transformer architectures for natural language processing\"")
+        st.info(
+            '💡 **Tip:** Be specific! Instead of "AI", try "Recent advances in transformer architectures for natural language processing"'
+        )
 
     # Display chat messages
     for msg in st.session_state.chat_messages:
@@ -563,6 +593,7 @@ if st.session_state.current_view == "chat":
                     # Always create session folder if one doesn't exist
                     if not st.session_state.chat_session_path:
                         from web_research_tools import ResearchConfig
+
                         topic_words = prompt.split()[:5]
                         topic_slug = "_".join(topic_words)[:30]
                         st.session_state.chat_session_path = ResearchConfig.create_session_folder(
@@ -575,7 +606,9 @@ if st.session_state.current_view == "chat":
                             "model": st.session_state.chat_model,
                             "created_at": datetime.now().isoformat(),
                         }
-                        with open(os.path.join(st.session_state.chat_session_path, "metadata.json"), "w") as f:
+                        with open(
+                            os.path.join(st.session_state.chat_session_path, "metadata.json"), "w"
+                        ) as f:
                             json.dump(chat_metadata, f, indent=2)
 
                     import concurrent.futures
@@ -611,18 +644,26 @@ if st.session_state.current_view == "chat":
                                 result += chunk
                             return result
 
-                        return anyio.run(collect_response, backend="asyncio", backend_options={"use_uvloop": False})
+                        return anyio.run(
+                            collect_response,
+                            backend="asyncio",
+                            backend_options={"use_uvloop": False},
+                        )
 
                     selected_model = st.session_state.chat_model
                     with concurrent.futures.ThreadPoolExecutor() as executor:
-                        future = executor.submit(run_async_chat, prompt, chat_history, session_path, selected_model)
+                        future = executor.submit(
+                            run_async_chat, prompt, chat_history, session_path, selected_model
+                        )
                         response_container[0] = future.result(timeout=300)
 
                     response_placeholder.markdown(response_container[0])
 
                     # Save/update completion.json with duration and cost
                     if st.session_state.chat_session_path:
-                        completion_path = os.path.join(st.session_state.chat_session_path, "completion.json")
+                        completion_path = os.path.join(
+                            st.session_state.chat_session_path, "completion.json"
+                        )
                         end_time = datetime.now()
                         duration_seconds = (end_time - start_time).total_seconds()
 
@@ -631,8 +672,12 @@ if st.session_state.current_view == "chat":
                             with open(completion_path, "r") as f:
                                 completion_data = json.load(f)
                             # Add to existing duration and cost
-                            completion_data["duration_seconds"] = completion_data.get("duration_seconds", 0) + duration_seconds
-                            completion_data["cost_usd"] = completion_data.get("cost_usd", 0) + cost_info.get("cost_usd", 0)
+                            completion_data["duration_seconds"] = (
+                                completion_data.get("duration_seconds", 0) + duration_seconds
+                            )
+                            completion_data["cost_usd"] = completion_data.get(
+                                "cost_usd", 0
+                            ) + cost_info.get("cost_usd", 0)
                         else:
                             completion_data = {
                                 "completed_at": end_time.isoformat(),
@@ -640,7 +685,7 @@ if st.session_state.current_view == "chat":
                                 "model": st.session_state.chat_model,
                                 "duration_seconds": duration_seconds,
                                 "cost_usd": cost_info.get("cost_usd", 0),
-                                "stats": {}
+                                "stats": {},
                             }
 
                         completion_data["last_updated"] = end_time.isoformat()
@@ -648,7 +693,9 @@ if st.session_state.current_view == "chat":
                             json.dump(completion_data, f, indent=2)
 
                         # Show completion summary
-                        st.success(f"✅ Research complete! Duration: {duration_seconds:.0f}s | Cost: ${cost_info.get('cost_usd', 0):.4f}")
+                        st.success(
+                            f"✅ Research complete! Duration: {duration_seconds:.0f}s | Cost: ${cost_info.get('cost_usd', 0):.4f}"
+                        )
 
                 except Exception as e:
                     error_details = traceback.format_exc()
@@ -656,7 +703,9 @@ if st.session_state.current_view == "chat":
                     response_placeholder.markdown(response_container[0])
 
             # Save assistant response
-            st.session_state.chat_messages.append({"role": "assistant", "content": response_container[0]})
+            st.session_state.chat_messages.append(
+                {"role": "assistant", "content": response_container[0]}
+            )
 
     # Quick action buttons with rotating topics
     st.markdown("---")
@@ -664,30 +713,126 @@ if st.session_state.current_view == "chat":
 
     # Pool of diverse research topics
     ALL_RESEARCH_TOPICS = [
-        {"icon": "🧠", "label": "Transformer Architectures", "query": "Research transformer architectures in deep learning - key innovations and recent advances"},
-        {"icon": "🧬", "label": "CRISPR Gene Editing", "query": "Research CRISPR gene editing technology - mechanisms, applications, and ethical considerations"},
-        {"icon": "🌍", "label": "Climate AI", "query": "Research how AI and machine learning are being applied to climate change prediction and mitigation"},
-        {"icon": "🤖", "label": "Large Language Models", "query": "Research the latest advances in large language models - architectures, training methods, and capabilities"},
-        {"icon": "🧪", "label": "mRNA Vaccines", "query": "Research mRNA vaccine technology - how it works, advantages, and future applications beyond COVID-19"},
-        {"icon": "🔋", "label": "Solid-State Batteries", "query": "Research solid-state battery technology - current progress, challenges, and potential for electric vehicles"},
-        {"icon": "🌐", "label": "Web3 & Blockchain", "query": "Research Web3 technologies and blockchain - decentralized systems, smart contracts, and real-world applications"},
-        {"icon": "🧠", "label": "Neuromorphic Computing", "query": "Research neuromorphic computing - brain-inspired chips, architectures, and applications"},
-        {"icon": "🔬", "label": "Quantum Computing", "query": "Research quantum computing advances - qubit technologies, algorithms, and near-term applications"},
-        {"icon": "🏥", "label": "AI in Drug Discovery", "query": "Research AI applications in drug discovery - molecular design, clinical trials, and recent breakthroughs"},
-        {"icon": "🚀", "label": "Space Exploration Tech", "query": "Research recent advances in space exploration technology - propulsion, habitation, and Mars missions"},
-        {"icon": "🌱", "label": "Vertical Farming", "query": "Research vertical farming and controlled environment agriculture - technologies, economics, and sustainability"},
-        {"icon": "🎮", "label": "AI in Gaming", "query": "Research AI applications in video games - procedural generation, NPCs, and player modeling"},
-        {"icon": "🔐", "label": "Post-Quantum Cryptography", "query": "Research post-quantum cryptography - algorithms resistant to quantum attacks and standardization efforts"},
-        {"icon": "🧬", "label": "Synthetic Biology", "query": "Research synthetic biology - engineered organisms, biofuels, and biosensors"},
-        {"icon": "🏗️", "label": "3D Printed Construction", "query": "Research 3D printing in construction - materials, techniques, and sustainable building applications"},
-        {"icon": "🧠", "label": "Brain-Computer Interfaces", "query": "Research brain-computer interfaces - neural implants, non-invasive methods, and medical applications"},
-        {"icon": "🌊", "label": "Ocean Energy", "query": "Research ocean energy technologies - wave, tidal, and thermal energy conversion systems"},
-        {"icon": "🤖", "label": "Autonomous Vehicles", "query": "Research autonomous vehicle technology - sensors, decision-making systems, and regulatory challenges"},
-        {"icon": "💊", "label": "Personalized Medicine", "query": "Research personalized medicine - genomics, pharmacogenomics, and tailored treatment approaches"},
-        {"icon": "🌿", "label": "Carbon Capture", "query": "Research carbon capture and storage technologies - direct air capture, geological storage, and utilization"},
-        {"icon": "🔮", "label": "Augmented Reality", "query": "Research augmented reality technology - displays, tracking, and enterprise applications"},
-        {"icon": "🧫", "label": "Lab-Grown Meat", "query": "Research cultured meat technology - cell cultivation, scaling challenges, and environmental impact"},
-        {"icon": "⚡", "label": "Nuclear Fusion", "query": "Research nuclear fusion energy - tokamaks, stellarators, and recent breakthrough experiments"},
+        {
+            "icon": "🧠",
+            "label": "Transformer Architectures",
+            "query": "Research transformer architectures in deep learning - key innovations and recent advances",
+        },
+        {
+            "icon": "🧬",
+            "label": "CRISPR Gene Editing",
+            "query": "Research CRISPR gene editing technology - mechanisms, applications, and ethical considerations",
+        },
+        {
+            "icon": "🌍",
+            "label": "Climate AI",
+            "query": "Research how AI and machine learning are being applied to climate change prediction and mitigation",
+        },
+        {
+            "icon": "🤖",
+            "label": "Large Language Models",
+            "query": "Research the latest advances in large language models - architectures, training methods, and capabilities",
+        },
+        {
+            "icon": "🧪",
+            "label": "mRNA Vaccines",
+            "query": "Research mRNA vaccine technology - how it works, advantages, and future applications beyond COVID-19",
+        },
+        {
+            "icon": "🔋",
+            "label": "Solid-State Batteries",
+            "query": "Research solid-state battery technology - current progress, challenges, and potential for electric vehicles",
+        },
+        {
+            "icon": "🌐",
+            "label": "Web3 & Blockchain",
+            "query": "Research Web3 technologies and blockchain - decentralized systems, smart contracts, and real-world applications",
+        },
+        {
+            "icon": "🧠",
+            "label": "Neuromorphic Computing",
+            "query": "Research neuromorphic computing - brain-inspired chips, architectures, and applications",
+        },
+        {
+            "icon": "🔬",
+            "label": "Quantum Computing",
+            "query": "Research quantum computing advances - qubit technologies, algorithms, and near-term applications",
+        },
+        {
+            "icon": "🏥",
+            "label": "AI in Drug Discovery",
+            "query": "Research AI applications in drug discovery - molecular design, clinical trials, and recent breakthroughs",
+        },
+        {
+            "icon": "🚀",
+            "label": "Space Exploration Tech",
+            "query": "Research recent advances in space exploration technology - propulsion, habitation, and Mars missions",
+        },
+        {
+            "icon": "🌱",
+            "label": "Vertical Farming",
+            "query": "Research vertical farming and controlled environment agriculture - technologies, economics, and sustainability",
+        },
+        {
+            "icon": "🎮",
+            "label": "AI in Gaming",
+            "query": "Research AI applications in video games - procedural generation, NPCs, and player modeling",
+        },
+        {
+            "icon": "🔐",
+            "label": "Post-Quantum Cryptography",
+            "query": "Research post-quantum cryptography - algorithms resistant to quantum attacks and standardization efforts",
+        },
+        {
+            "icon": "🧬",
+            "label": "Synthetic Biology",
+            "query": "Research synthetic biology - engineered organisms, biofuels, and biosensors",
+        },
+        {
+            "icon": "🏗️",
+            "label": "3D Printed Construction",
+            "query": "Research 3D printing in construction - materials, techniques, and sustainable building applications",
+        },
+        {
+            "icon": "🧠",
+            "label": "Brain-Computer Interfaces",
+            "query": "Research brain-computer interfaces - neural implants, non-invasive methods, and medical applications",
+        },
+        {
+            "icon": "🌊",
+            "label": "Ocean Energy",
+            "query": "Research ocean energy technologies - wave, tidal, and thermal energy conversion systems",
+        },
+        {
+            "icon": "🤖",
+            "label": "Autonomous Vehicles",
+            "query": "Research autonomous vehicle technology - sensors, decision-making systems, and regulatory challenges",
+        },
+        {
+            "icon": "💊",
+            "label": "Personalized Medicine",
+            "query": "Research personalized medicine - genomics, pharmacogenomics, and tailored treatment approaches",
+        },
+        {
+            "icon": "🌿",
+            "label": "Carbon Capture",
+            "query": "Research carbon capture and storage technologies - direct air capture, geological storage, and utilization",
+        },
+        {
+            "icon": "🔮",
+            "label": "Augmented Reality",
+            "query": "Research augmented reality technology - displays, tracking, and enterprise applications",
+        },
+        {
+            "icon": "🧫",
+            "label": "Lab-Grown Meat",
+            "query": "Research cultured meat technology - cell cultivation, scaling challenges, and environmental impact",
+        },
+        {
+            "icon": "⚡",
+            "label": "Nuclear Fusion",
+            "query": "Research nuclear fusion energy - tokamaks, stellarators, and recent breakthrough experiments",
+        },
     ]
 
     # Initialize or get random topics for this session
@@ -699,17 +844,17 @@ if st.session_state.current_view == "chat":
 
     with col1:
         if st.button(f"{topics[0]['icon']} {topics[0]['label']}", use_container_width=True):
-            st.session_state.pending_query = topics[0]['query']
+            st.session_state.pending_query = topics[0]["query"]
             st.rerun()
 
     with col2:
         if st.button(f"{topics[1]['icon']} {topics[1]['label']}", use_container_width=True):
-            st.session_state.pending_query = topics[1]['query']
+            st.session_state.pending_query = topics[1]["query"]
             st.rerun()
 
     with col3:
         if st.button(f"{topics[2]['icon']} {topics[2]['label']}", use_container_width=True):
-            st.session_state.pending_query = topics[2]['query']
+            st.session_state.pending_query = topics[2]["query"]
             st.rerun()
 
     # Refresh topics button
@@ -728,14 +873,13 @@ elif st.session_state.current_view == "structured":
 
     with st.form("research_form"):
         topic = st.text_input(
-            "Research Topic *",
-            placeholder="e.g., Mixture of Experts in Large Language Models"
+            "Research Topic *", placeholder="e.g., Mixture of Experts in Large Language Models"
         )
 
         background = st.text_area(
             "Background & Context *",
             placeholder="What specific aspects are you interested in?\nWhat questions do you want answered?",
-            height=120
+            height=120,
         )
 
         col1, col2, col3, col4 = st.columns(4)
@@ -746,11 +890,15 @@ elif st.session_state.current_view == "structured":
         with col3:
             max_searches = st.number_input("Max Searches", 3, 30, 15)
         with col4:
-            model = st.selectbox("Model", [
-                "claude-sonnet-4-20250514",
-                "claude-opus-4-20250514",
-                "claude-haiku-3-5-20241022",
-            ], index=0)
+            model = st.selectbox(
+                "Model",
+                [
+                    "claude-sonnet-4-20250514",
+                    "claude-opus-4-20250514",
+                    "claude-haiku-3-5-20241022",
+                ],
+                index=0,
+            )
 
         col4, col5 = st.columns(2)
         with col4:
@@ -758,7 +906,9 @@ elif st.session_state.current_view == "structured":
         with col5:
             domains = st.text_input("Domains", placeholder="e.g., ML, biology")
 
-        submitted = st.form_submit_button("🚀 Start Research", type="primary", use_container_width=True)
+        submitted = st.form_submit_button(
+            "🚀 Start Research", type="primary", use_container_width=True
+        )
 
         if submitted and topic and background:
             st.session_state.research_running = True
@@ -837,25 +987,35 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
 
     # Count actual PDFs and notes from filesystem (more reliable)
     pdfs_dir = os.path.join(session["path"], "pdfs")
-    actual_pdfs = len([f for f in os.listdir(pdfs_dir) if f.endswith(".pdf")]) if os.path.exists(pdfs_dir) else 0
+    actual_pdfs = (
+        len([f for f in os.listdir(pdfs_dir) if f.endswith(".pdf")])
+        if os.path.exists(pdfs_dir)
+        else 0
+    )
     notes_dir = os.path.join(session["path"], "notes")
     actual_notes = len(os.listdir(notes_dir)) if os.path.exists(notes_dir) else 0
 
     # Use actual counts, fall back to stats if available
-    paper_count = actual_pdfs or stats.get('pdfs_read', stats.get('reads', 0))
-    notes_count = actual_notes or stats.get('notes_saved', stats.get('notes', 0))
+    paper_count = actual_pdfs or stats.get("pdfs_read", stats.get("reads", 0))
+    notes_count = actual_notes or stats.get("notes_saved", stats.get("notes", 0))
 
     # Enhanced metrics display with icons
     cols = st.columns(5)
     with cols[0]:
-        model_icon = "🧠" if "opus" in model_full.lower() else "⚡" if "sonnet" in model_full.lower() else "🚀"
+        model_icon = (
+            "🧠"
+            if "opus" in model_full.lower()
+            else "⚡" if "sonnet" in model_full.lower() else "🚀"
+        )
         st.metric(f"{model_icon} Model", model_display)
     with cols[1]:
-        duration = comp.get('duration_seconds', 0)
-        duration_display = f"{int(duration//60)}m {int(duration%60)}s" if duration >= 60 else f"{int(duration)}s"
+        duration = comp.get("duration_seconds", 0)
+        duration_display = (
+            f"{int(duration//60)}m {int(duration%60)}s" if duration >= 60 else f"{int(duration)}s"
+        )
         st.metric("⏱️ Duration", duration_display if duration else "—")
     with cols[2]:
-        cost = comp.get('cost_usd')
+        cost = comp.get("cost_usd")
         st.metric("💰 Cost", f"${cost:.3f}" if cost else "—")
     with cols[3]:
         st.metric("📚 Papers", paper_count if paper_count else "—")
@@ -885,11 +1045,11 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                     try:
                         with open(note_path, "r", encoding="utf-8") as f:
                             note_data = json.load(f)
-                            note_data['_filename'] = note_file
-                            note_type = note_data.get('type', note_data.get('note_type', 'other'))
-                            if note_type == 'finding':
+                            note_data["_filename"] = note_file
+                            note_type = note_data.get("type", note_data.get("note_type", "other"))
+                            if note_type == "finding":
                                 findings.append(note_data)
-                            elif note_type == 'paper_summary':
+                            elif note_type == "paper_summary":
                                 summaries.append(note_data)
                             else:
                                 other_notes.append(note_data)
@@ -901,15 +1061,15 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                     st.markdown("### 📚 Paper Summaries")
                     for note in summaries:
                         with st.expander(f"📄 {note.get('title', 'Untitled')}", expanded=True):
-                            st.markdown(note.get('content', 'No content available'))
+                            st.markdown(note.get("content", "No content available"))
 
                             # Source info
-                            source = note.get('source', '')
-                            if source and source != 'N/A':
+                            source = note.get("source", "")
+                            if source and source != "N/A":
                                 st.markdown(f"**Source:** {source}")
 
                             # Tags
-                            tags = note.get('tags', [])
+                            tags = note.get("tags", [])
                             if tags:
                                 st.markdown("**Tags:** " + " ".join([f"`{tag}`" for tag in tags]))
                     st.markdown("")
@@ -919,13 +1079,13 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                     st.markdown("### 💡 Key Findings")
                     for note in findings:
                         with st.expander(f"🔍 {note.get('title', 'Untitled')}", expanded=False):
-                            st.markdown(note.get('content', 'No content available'))
+                            st.markdown(note.get("content", "No content available"))
 
-                            source = note.get('source', '')
-                            if source and source != 'N/A':
+                            source = note.get("source", "")
+                            if source and source != "N/A":
                                 st.caption(f"📖 Source: {source}")
 
-                            tags = note.get('tags', [])
+                            tags = note.get("tags", [])
                             if tags:
                                 st.caption("🏷️ " + " • ".join(tags))
                     st.markdown("")
@@ -935,16 +1095,20 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                     st.markdown("### 📝 Additional Notes")
                     for note in other_notes:
                         with st.expander(f"📌 {note.get('title', 'Untitled')}", expanded=False):
-                            st.markdown(note.get('content', 'No content available'))
+                            st.markdown(note.get("content", "No content available"))
 
-                            source = note.get('source', '')
-                            if source and source != 'N/A':
+                            source = note.get("source", "")
+                            if source and source != "N/A":
                                 st.caption(f"Source: {source}")
 
             elif paper_count > 0:
-                st.info(f"📚 This session has **{paper_count} downloaded PDFs**. View them in the PDFs tab or ask questions about them.")
+                st.info(
+                    f"📚 This session has **{paper_count} downloaded PDFs**. View them in the PDFs tab or ask questions about them."
+                )
             else:
-                st.warning("⏳ This session appears to be empty or still in progress. Try running a new research query.")
+                st.warning(
+                    "⏳ This session appears to be empty or still in progress. Try running a new research query."
+                )
 
     with tab2:
         pdfs = get_session_pdfs(session["path"])
@@ -968,12 +1132,16 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                     pdf_path = get_pdf_path(session["path"], pdf)
                     if pdf_path:
                         with open(pdf_path, "rb") as f:
-                            st.download_button("⬇️ Download", f.read(), pdf, "application/pdf", key=f"dl_{pdf}")
+                            st.download_button(
+                                "⬇️ Download", f.read(), pdf, "application/pdf", key=f"dl_{pdf}"
+                            )
 
             # PDF Viewer
             st.markdown("---")
             st.markdown("### 👁️ PDF Viewer")
-            selected_pdf = st.selectbox("Select a paper to view:", ["-- Select a PDF --"] + pdfs, key="pdf_viewer_select")
+            selected_pdf = st.selectbox(
+                "Select a paper to view:", ["-- Select a PDF --"] + pdfs, key="pdf_viewer_select"
+            )
             if selected_pdf and selected_pdf != "-- Select a PDF --":
                 pdf_path = get_pdf_path(session["path"], selected_pdf)
                 if pdf_path:
@@ -981,7 +1149,7 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                         b64 = base64.b64encode(f.read()).decode()
                     st.markdown(
                         f'<iframe src="data:application/pdf;base64,{b64}" width="100%" height="700px" style="border: 1px solid #ddd; border-radius: 8px;"></iframe>',
-                        unsafe_allow_html=True
+                        unsafe_allow_html=True,
                     )
 
     with tab3:
@@ -1024,7 +1192,9 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
 
                             # Set Windows event loop policy for subprocess support
                             if sys.platform == "win32":
-                                asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+                                asyncio.set_event_loop_policy(
+                                    asyncio.WindowsProactorEventLoopPolicy()
+                                )
 
                             async def collect_followup():
                                 result = ""
@@ -1038,10 +1208,16 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                                     result += chunk
                                 return result
 
-                            return anyio.run(collect_followup, backend="asyncio", backend_options={"use_uvloop": False})
+                            return anyio.run(
+                                collect_followup,
+                                backend="asyncio",
+                                backend_options={"use_uvloop": False},
+                            )
 
                         with concurrent.futures.ThreadPoolExecutor() as executor:
-                            future = executor.submit(run_followup_chat, followup, followup_history, sess_path, sess_model)
+                            future = executor.submit(
+                                run_followup_chat, followup, followup_history, sess_path, sess_model
+                            )
                             response_container[0] = future.result(timeout=300)
 
                         placeholder.markdown(response_container[0])
@@ -1051,7 +1227,9 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                         response_container[0] = f"Error: {str(e)}\n\n```\n{error_details}\n```"
                         placeholder.markdown(response_container[0])
 
-                st.session_state[chat_key].append({"role": "assistant", "content": response_container[0]})
+                st.session_state[chat_key].append(
+                    {"role": "assistant", "content": response_container[0]}
+                )
 
 
 # =============================================================================

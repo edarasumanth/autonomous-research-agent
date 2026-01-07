@@ -14,6 +14,7 @@ import pytest
 
 # Add parent directory to path for imports
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
@@ -23,7 +24,7 @@ class TestSessionHelpers:
     def test_get_research_sessions_empty(self, tmp_path):
         """Test getting sessions from empty directory."""
         # Import the function (mocking streamlit)
-        with patch.dict(sys.modules, {'streamlit': MagicMock()}):
+        with patch.dict(sys.modules, {"streamlit": MagicMock()}):
             # We need to test the logic, not the actual streamlit import
             sessions_dir = tmp_path / "research_sessions"
             sessions_dir.mkdir()
@@ -40,10 +41,7 @@ class TestSessionHelpers:
         session = sessions_dir / "20240108_120000_test_topic"
         session.mkdir()
 
-        metadata = {
-            "topic": "Test Topic",
-            "created_at": datetime.now().isoformat()
-        }
+        metadata = {"topic": "Test Topic", "created_at": datetime.now().isoformat()}
         (session / "metadata.json").write_text(json.dumps(metadata))
 
         sessions = [d for d in sessions_dir.iterdir() if d.is_dir()]
@@ -75,7 +73,7 @@ class TestMetadataParsing:
         metadata = {
             "topic": "AI Research",
             "created_at": "2024-01-08T12:00:00",
-            "model": "claude-sonnet-4-20250514"
+            "model": "claude-sonnet-4-20250514",
         }
 
         metadata_file = tmp_path / "metadata.json"
@@ -94,13 +92,7 @@ class TestMetadataParsing:
             "duration_ms": 180000,
             "cost_usd": 0.50,
             "model": "claude-sonnet-4-20250514",
-            "stats": {
-                "searches": 3,
-                "downloads": 5,
-                "reads": 5,
-                "notes": 4,
-                "report": True
-            }
+            "stats": {"searches": 3, "downloads": 5, "reads": 5, "notes": 4, "report": True},
         }
 
         completion_file = tmp_path / "completion.json"
@@ -124,13 +116,9 @@ class TestTopicGeneration:
             {
                 "icon": "🧠",
                 "label": "Transformer Architectures",
-                "query": "Research transformer architectures"
+                "query": "Research transformer architectures",
             },
-            {
-                "icon": "🧬",
-                "label": "CRISPR Gene Editing",
-                "query": "Research CRISPR applications"
-            }
+            {"icon": "🧬", "label": "CRISPR Gene Editing", "query": "Research CRISPR applications"},
         ]
 
         for topic in sample_topics:
@@ -159,7 +147,7 @@ class TestModelSelection:
         model_options = {
             "🧠 Opus (Best)": "claude-opus-4-20250514",
             "⚡ Sonnet (Fast)": "claude-sonnet-4-20250514",
-            "🚀 Haiku (Quick)": "claude-haiku-3-20250514"
+            "🚀 Haiku (Quick)": "claude-haiku-3-20250514",
         }
 
         assert len(model_options) == 3

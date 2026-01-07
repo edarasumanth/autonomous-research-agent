@@ -14,6 +14,7 @@ import pytest
 
 # Add parent directory to path for imports
 import sys
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from web_research_tools import (
@@ -141,13 +142,15 @@ class TestSaveNote:
         os.makedirs(os.path.join(session_dir, "notes"), exist_ok=True)
         ResearchConfig.set_output_dir(session_dir)
 
-        result = await _save_note_impl({
-            "note_type": "finding",
-            "title": "Test Finding",
-            "content": "This is a test finding.",
-            "source": "test_paper.pdf",
-            "tags": ["test"]
-        })
+        result = await _save_note_impl(
+            {
+                "note_type": "finding",
+                "title": "Test Finding",
+                "content": "This is a test finding.",
+                "source": "test_paper.pdf",
+                "tags": ["test"],
+            }
+        )
 
         assert "is_error" not in result or not result.get("is_error")
 
@@ -164,12 +167,14 @@ class TestSaveNote:
         os.makedirs(os.path.join(session_dir, "notes"), exist_ok=True)
         ResearchConfig.set_output_dir(session_dir)
 
-        await _save_note_impl({
-            "note_type": "finding",
-            "title": "Key Finding",
-            "content": "Important discovery about AI.",
-            "source": "paper.pdf"
-        })
+        await _save_note_impl(
+            {
+                "note_type": "finding",
+                "title": "Key Finding",
+                "content": "Important discovery about AI.",
+                "source": "paper.pdf",
+            }
+        )
 
         # Read the saved file
         notes_dir = os.path.join(session_dir, "notes")
@@ -208,11 +213,9 @@ class TestReadNotes:
 
         # Save multiple notes
         for i in range(3):
-            await _save_note_impl({
-                "note_type": "finding",
-                "title": f"Note {i}",
-                "content": f"Content {i}"
-            })
+            await _save_note_impl(
+                {"note_type": "finding", "title": f"Note {i}", "content": f"Content {i}"}
+            )
 
         result = await _read_notes_impl({})
 
@@ -230,12 +233,14 @@ class TestWriteReport:
         os.makedirs(session_dir, exist_ok=True)
         ResearchConfig.set_output_dir(session_dir)
 
-        result = await _write_report_impl({
-            "title": "Test Research Report",
-            "executive_summary": "This is a test report summary.",
-            "findings": ["Finding 1", "Finding 2"],
-            "references": ["Reference 1"]
-        })
+        result = await _write_report_impl(
+            {
+                "title": "Test Research Report",
+                "executive_summary": "This is a test report summary.",
+                "findings": ["Finding 1", "Finding 2"],
+                "references": ["Reference 1"],
+            }
+        )
 
         assert "is_error" not in result or not result.get("is_error")
         assert os.path.exists(os.path.join(session_dir, "report.md"))
@@ -247,11 +252,13 @@ class TestWriteReport:
         os.makedirs(session_dir, exist_ok=True)
         ResearchConfig.set_output_dir(session_dir)
 
-        await _write_report_impl({
-            "title": "My Research",
-            "executive_summary": "Summary of findings.",
-            "findings": ["Key finding 1", "Key finding 2"]
-        })
+        await _write_report_impl(
+            {
+                "title": "My Research",
+                "executive_summary": "Summary of findings.",
+                "findings": ["Key finding 1", "Key finding 2"],
+            }
+        )
 
         with open(os.path.join(session_dir, "report.md")) as f:
             content = f.read()
@@ -298,13 +305,13 @@ class TestWebSearch:
                 {
                     "title": "Test Paper 1",
                     "url": "https://arxiv.org/pdf/1234.pdf",
-                    "content": "Abstract of test paper 1"
+                    "content": "Abstract of test paper 1",
                 },
                 {
                     "title": "Test Paper 2",
                     "url": "https://arxiv.org/abs/5678",
-                    "content": "Abstract of test paper 2"
-                }
+                    "content": "Abstract of test paper 2",
+                },
             ]
         }
 
@@ -314,7 +321,9 @@ class TestWebSearch:
                 mock_instance.search.return_value = mock_response
                 MockClient.return_value = mock_instance
 
-                result = await _web_search_impl({"query": "transformer architecture", "max_results": 5})
+                result = await _web_search_impl(
+                    {"query": "transformer architecture", "max_results": 5}
+                )
 
                 assert "is_error" not in result or not result.get("is_error")
                 assert "Found 2 results" in result["content"][0]["text"]
@@ -389,28 +398,34 @@ class TestIntegration:
         ResearchConfig.set_output_dir(session_dir)
 
         # Save notes
-        await _save_note_impl({
-            "note_type": "finding",
-            "title": "Finding 1",
-            "content": "First important finding",
-            "source": "paper1.pdf"
-        })
-        await _save_note_impl({
-            "note_type": "finding",
-            "title": "Finding 2",
-            "content": "Second important finding",
-            "source": "paper2.pdf"
-        })
+        await _save_note_impl(
+            {
+                "note_type": "finding",
+                "title": "Finding 1",
+                "content": "First important finding",
+                "source": "paper1.pdf",
+            }
+        )
+        await _save_note_impl(
+            {
+                "note_type": "finding",
+                "title": "Finding 2",
+                "content": "Second important finding",
+                "source": "paper2.pdf",
+            }
+        )
 
         # Read notes
         notes_result = await _read_notes_impl({})
         assert "2 notes" in notes_result["content"][0]["text"]
 
         # Write report
-        report_result = await _write_report_impl({
-            "title": "Research Summary",
-            "executive_summary": "This is a summary of findings.",
-            "findings": ["Finding 1", "Finding 2"]
-        })
+        report_result = await _write_report_impl(
+            {
+                "title": "Research Summary",
+                "executive_summary": "This is a summary of findings.",
+                "findings": ["Finding 1", "Finding 2"],
+            }
+        )
 
         assert os.path.exists(os.path.join(session_dir, "report.md"))

@@ -23,6 +23,7 @@ from claude_agent_sdk import tool, create_sdk_mcp_server
 # Configuration - Thread-safe output directory management
 # =============================================================================
 
+
 class ResearchConfig:
     """Thread-safe configuration for research sessions."""
 
@@ -40,7 +41,7 @@ class ResearchConfig:
     @classmethod
     def get_output_dir(cls) -> str:
         """Get the current output directory."""
-        return getattr(cls._local, 'output_dir', cls._default_base_dir)
+        return getattr(cls._local, "output_dir", cls._default_base_dir)
 
     @classmethod
     def get_pdfs_dir(cls) -> str:
@@ -72,6 +73,7 @@ class ResearchConfig:
 # Web Search Tool
 # =============================================================================
 
+
 def _is_pdf_url(url: str) -> bool:
     """Check if a URL likely points to a PDF document."""
     url_lower = url.lower()
@@ -98,11 +100,25 @@ async def _web_search_impl(args: dict) -> dict:
         enhanced_query = f"{query} research paper PDF academic"
 
         include_domains = [
-            "arxiv.org", "scholar.google.com", "pubmed.ncbi.nlm.nih.gov",
-            "ncbi.nlm.nih.gov", "sciencedirect.com", "nature.com", "science.org",
-            "ieee.org", "acm.org", "researchgate.net", "semanticscholar.org",
-            "biorxiv.org", "medrxiv.org", "plos.org", "frontiersin.org",
-            "mdpi.com", "springer.com", "wiley.com", "cell.com",
+            "arxiv.org",
+            "scholar.google.com",
+            "pubmed.ncbi.nlm.nih.gov",
+            "ncbi.nlm.nih.gov",
+            "sciencedirect.com",
+            "nature.com",
+            "science.org",
+            "ieee.org",
+            "acm.org",
+            "researchgate.net",
+            "semanticscholar.org",
+            "biorxiv.org",
+            "medrxiv.org",
+            "plos.org",
+            "frontiersin.org",
+            "mdpi.com",
+            "springer.com",
+            "wiley.com",
+            "cell.com",
         ]
 
         response = client.search(
@@ -124,11 +140,7 @@ async def _web_search_impl(args: dict) -> dict:
             url = result.get("url", "")
             content = result.get("content", "")[:200]
             is_pdf = "📄 [PDF]" if url in pdf_urls else ""
-            output_lines.extend([
-                f"\n{i}. {title} {is_pdf}",
-                f"   URL: {url}",
-                f"   {content}..."
-            ])
+            output_lines.extend([f"\n{i}. {title} {is_pdf}", f"   URL: {url}", f"   {content}..."])
 
         if pdf_urls:
             output_lines.append(f"\n\nPDF URLs for download:")
@@ -158,6 +170,7 @@ web_search = tool(
 # PDF Download Tool
 # =============================================================================
 
+
 def _extract_filename_from_url(url: str) -> str:
     """Extract a filename from URL."""
     parsed = urlparse(url)
@@ -170,6 +183,7 @@ def _extract_filename_from_url(url: str) -> str:
             filename = f"{parts[-1]}.pdf"
         else:
             import hashlib
+
             url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
             filename = f"{parsed.netloc}_{url_hash}.pdf"
 
@@ -185,12 +199,19 @@ async def _download_single_pdf(url: str, output_dir: str) -> dict:
     filepath = os.path.join(output_dir, filename)
 
     if os.path.exists(filepath):
-        return {"success": True, "url": url, "filepath": filepath, "filename": filename, "skipped": True}
+        return {
+            "success": True,
+            "url": url,
+            "filepath": filepath,
+            "filename": filename,
+            "skipped": True,
+        }
 
     try:
         async with httpx.AsyncClient(
-            timeout=60, follow_redirects=True,
-            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"}
+            timeout=60,
+            follow_redirects=True,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
         ) as client:
             response = await client.get(url)
             response.raise_for_status()
@@ -198,13 +219,21 @@ async def _download_single_pdf(url: str, output_dir: str) -> dict:
             content_type = response.headers.get("content-type", "").lower()
             if "pdf" not in content_type and not url.lower().endswith(".pdf"):
                 if response.content[:4] != b"%PDF":
-                    return {"success": False, "url": url, "filename": filename, "error": f"Not a PDF"}
+                    return {
+                        "success": False,
+                        "url": url,
+                        "filename": filename,
+                        "error": f"Not a PDF",
+                    }
 
             with open(filepath, "wb") as f:
                 f.write(response.content)
 
             return {
-                "success": True, "url": url, "filepath": filepath, "filename": filename,
+                "success": True,
+                "url": url,
+                "filepath": filepath,
+                "filename": filename,
                 "file_size_bytes": len(response.content),
                 "file_size_mb": round(len(response.content) / (1024 * 1024), 2),
             }
@@ -212,7 +241,12 @@ async def _download_single_pdf(url: str, output_dir: str) -> dict:
     except httpx.TimeoutException:
         return {"success": False, "url": url, "filename": filename, "error": "Timeout"}
     except httpx.HTTPStatusError as e:
-        return {"success": False, "url": url, "filename": filename, "error": f"HTTP {e.response.status_code}"}
+        return {
+            "success": False,
+            "url": url,
+            "filename": filename,
+            "error": f"HTTP {e.response.status_code}",
+        }
     except Exception as e:
         return {"success": False, "url": url, "filename": filename, "error": str(e)}
 
@@ -242,13 +276,19 @@ async def _download_pdfs_impl(args: dict) -> dict:
     output_lines = [
         f"Download Summary:",
         f"  Total: {len(urls)}, Successful: {successful}, Failed: {failed}, Skipped: {skipped}",
-        f"  Output folder: {output_dir}/", "", "Details:"
+        f"  Output folder: {output_dir}/",
+        "",
+        "Details:",
     ]
 
     for result in results:
         if result["success"]:
             status = "⏭️" if result.get("skipped") else "✅"
-            suffix = "(already exists)" if result.get("skipped") else f"({result.get('file_size_mb', 0)} MB)"
+            suffix = (
+                "(already exists)"
+                if result.get("skipped")
+                else f"({result.get('file_size_mb', 0)} MB)"
+            )
             output_lines.append(f"  {status} {result['filename']} {suffix}")
         else:
             output_lines.append(f"  ❌ {result.get('filename', 'unknown')}: {result.get('error')}")
@@ -262,7 +302,11 @@ download_pdfs = tool(
     input_schema={
         "type": "object",
         "properties": {
-            "urls": {"type": "array", "items": {"type": "string"}, "description": "PDF URLs to download"},
+            "urls": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "PDF URLs to download",
+            },
         },
         "required": ["urls"],
     },
@@ -272,6 +316,7 @@ download_pdfs = tool(
 # =============================================================================
 # PDF Reading Tool
 # =============================================================================
+
 
 async def _read_pdf_impl(args: dict) -> dict:
     """Extract text from a PDF in the session's pdfs folder."""
@@ -284,7 +329,10 @@ async def _read_pdf_impl(args: dict) -> dict:
     filepath = os.path.join(ResearchConfig.get_pdfs_dir(), filename)
 
     if not os.path.exists(filepath):
-        return {"content": [{"type": "text", "text": f"Error: '{filename}' not found"}], "is_error": True}
+        return {
+            "content": [{"type": "text", "text": f"Error: '{filename}' not found"}],
+            "is_error": True,
+        }
 
     try:
         extracted_text = []
@@ -298,16 +346,30 @@ async def _read_pdf_impl(args: dict) -> dict:
                     extracted_text.append(f"--- Page {i + 1} ---\n{text}")
 
         if not extracted_text:
-            return {"content": [{"type": "text", "text": f"Warning: No text extracted from '{filename}'"}]}
+            return {
+                "content": [
+                    {"type": "text", "text": f"Warning: No text extracted from '{filename}'"}
+                ]
+            }
 
         full_text = "\n\n".join(extracted_text)
         if len(full_text) > 50000:
             full_text = full_text[:50000] + f"\n\n[... Truncated ...]"
 
-        return {"content": [{"type": "text", "text": f"PDF: {filename}\nPages: {len(extracted_text)}/{total_pages}\n\n{full_text}"}]}
+        return {
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"PDF: {filename}\nPages: {len(extracted_text)}/{total_pages}\n\n{full_text}",
+                }
+            ]
+        }
 
     except Exception as e:
-        return {"content": [{"type": "text", "text": f"Error reading '{filename}': {str(e)}"}], "is_error": True}
+        return {
+            "content": [{"type": "text", "text": f"Error reading '{filename}': {str(e)}"}],
+            "is_error": True,
+        }
 
 
 read_pdf = tool(
@@ -328,6 +390,7 @@ read_pdf = tool(
 # Research Notes Tools
 # =============================================================================
 
+
 async def _save_note_impl(args: dict) -> dict:
     """Save a research note to the session's notes folder."""
     note_type = args["note_type"]
@@ -340,8 +403,12 @@ async def _save_note_impl(args: dict) -> dict:
     os.makedirs(notes_dir, exist_ok=True)
 
     note = {
-        "type": note_type, "title": title, "content": content,
-        "source": source, "tags": tags, "timestamp": datetime.now().isoformat(),
+        "type": note_type,
+        "title": title,
+        "content": content,
+        "source": source,
+        "tags": tags,
+        "timestamp": datetime.now().isoformat(),
     }
 
     safe_title = "".join(c if c.isalnum() or c in " -_" else "_" for c in title)[:50]
@@ -362,7 +429,10 @@ save_note = tool(
     input_schema={
         "type": "object",
         "properties": {
-            "note_type": {"type": "string", "enum": ["finding", "paper_summary", "insight", "synthesis"]},
+            "note_type": {
+                "type": "string",
+                "enum": ["finding", "paper_summary", "insight", "synthesis"],
+            },
             "title": {"type": "string"},
             "content": {"type": "string"},
             "source": {"type": "string"},
@@ -395,12 +465,14 @@ async def _read_notes_impl(args: dict) -> dict:
 
     output_lines = [f"Found {len(notes)} notes:\n"]
     for i, note in enumerate(notes, 1):
-        output_lines.extend([
-            f"\n{'='*60}",
-            f"Note {i}: [{note['type'].upper()}] {note['title']}",
-            f"Source: {note.get('source', 'N/A')}",
-            f"\n{note['content']}"
-        ])
+        output_lines.extend(
+            [
+                f"\n{'='*60}",
+                f"Note {i}: [{note['type'].upper()}] {note['title']}",
+                f"Source: {note.get('source', 'N/A')}",
+                f"\n{note['content']}",
+            ]
+        )
 
     return {"content": [{"type": "text", "text": "\n".join(output_lines)}]}
 
@@ -411,7 +483,10 @@ read_notes = tool(
     input_schema={
         "type": "object",
         "properties": {
-            "note_type": {"type": "string", "enum": ["all", "finding", "paper_summary", "insight", "synthesis"]},
+            "note_type": {
+                "type": "string",
+                "enum": ["all", "finding", "paper_summary", "insight", "synthesis"],
+            },
         },
     },
 )(_read_notes_impl)
@@ -420,6 +495,7 @@ read_notes = tool(
 # =============================================================================
 # Write Report Tool
 # =============================================================================
+
 
 async def _write_report_impl(args: dict) -> dict:
     """Generate and save the final research report."""
@@ -434,7 +510,10 @@ async def _write_report_impl(args: dict) -> dict:
     report_lines = [
         f"# Research Report: {title}",
         f"\n*Generated: {timestamp.strftime('%Y-%m-%d %H:%M:%S')}*",
-        "\n---\n", "## Executive Summary\n", executive_summary, "\n---\n",
+        "\n---\n",
+        "## Executive Summary\n",
+        executive_summary,
+        "\n---\n",
     ]
 
     if findings:
@@ -446,7 +525,13 @@ async def _write_report_impl(args: dict) -> dict:
         report_lines.append("## Paper Summaries\n")
         for s in paper_summaries:
             if isinstance(s, dict):
-                report_lines.extend([f"### {s.get('title', 'Untitled')}\n", f"**Source:** {s.get('source', 'N/A')}\n", f"{s.get('content', '')}\n"])
+                report_lines.extend(
+                    [
+                        f"### {s.get('title', 'Untitled')}\n",
+                        f"**Source:** {s.get('source', 'N/A')}\n",
+                        f"{s.get('content', '')}\n",
+                    ]
+                )
             else:
                 report_lines.append(f"{s}\n")
         report_lines.append("\n---\n")
@@ -470,7 +555,9 @@ async def _write_report_impl(args: dict) -> dict:
     try:
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(report_content)
-        return {"content": [{"type": "text", "text": f"Report saved: {filepath}\n\n{report_content}"}]}
+        return {
+            "content": [{"type": "text", "text": f"Report saved: {filepath}\n\n{report_content}"}]
+        }
     except Exception as e:
         return {"content": [{"type": "text", "text": f"Error: {str(e)}"}], "is_error": True}
 

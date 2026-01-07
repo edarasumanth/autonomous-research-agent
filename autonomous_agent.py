@@ -31,25 +31,26 @@ from autonomous_tools import autonomous_tools_server
 # Research Request Data Structure
 # =============================================================================
 
+
 @dataclass
 class ResearchRequest:
     """Structured input for autonomous research agent."""
 
     # Core research specification
-    topic: str                                              # Main research question/topic
-    background: str                                         # Context and background information
+    topic: str  # Main research question/topic
+    background: str  # Context and background information
 
     # Scope constraints
     depth: Literal["quick", "standard", "deep"] = "standard"  # Research depth
-    max_papers: int = 10                                    # Maximum papers to download
-    time_period: str | None = None                          # e.g., "2020-2024"
-    domains: list[str] = field(default_factory=list)        # Focus domains
+    max_papers: int = 10  # Maximum papers to download
+    time_period: str | None = None  # e.g., "2020-2024"
+    domains: list[str] = field(default_factory=list)  # Focus domains
 
     # Completion criteria (optional - agent infers if not provided)
     completion_criteria: str | None = None
 
     # Safety limits
-    max_searches: int = 20                                  # Maximum web searches
+    max_searches: int = 20  # Maximum web searches
 
 
 # =============================================================================
@@ -133,12 +134,17 @@ Research is complete when ALL of these conditions are met:
 # Request Formatting
 # =============================================================================
 
+
 def format_research_request(request: ResearchRequest) -> str:
     """Format the research request as a prompt for the agent."""
 
     domains_str = ", ".join(request.domains) if request.domains else "All relevant academic domains"
     time_str = request.time_period if request.time_period else "Any time period"
-    criteria_str = request.completion_criteria if request.completion_criteria else "Agent determines completion based on standard criteria"
+    criteria_str = (
+        request.completion_criteria
+        if request.completion_criteria
+        else "Agent determines completion based on standard criteria"
+    )
 
     depth_descriptions = {
         "quick": "Quick overview - find 2-3 key papers and summarize main points",
@@ -175,6 +181,7 @@ Begin your autonomous research now. Execute your plan completely without asking 
 # Main Execution Function
 # =============================================================================
 
+
 async def run_autonomous_research(request: ResearchRequest) -> dict:
     """
     Execute fully autonomous research workflow.
@@ -204,8 +211,8 @@ async def run_autonomous_research(request: ResearchRequest) -> dict:
         system_prompt=AUTONOMOUS_SYSTEM_PROMPT,
         mcp_servers={"research": autonomous_tools_server},
         permission_mode="bypassPermissions",
-        max_turns=100,        # Safety limit on conversation turns
-        max_budget_usd=5.0,   # Cost safety limit
+        max_turns=100,  # Safety limit on conversation turns
+        max_budget_usd=5.0,  # Cost safety limit
     )
 
     # Track statistics
@@ -231,7 +238,9 @@ async def run_autonomous_research(request: ResearchRequest) -> dict:
                     if isinstance(block, TextBlock):
                         # Print agent's thoughts/text
                         if block.text.strip():
-                            print(f"\n[Agent]: {block.text[:200]}{'...' if len(block.text) > 200 else ''}")
+                            print(
+                                f"\n[Agent]: {block.text[:200]}{'...' if len(block.text) > 200 else ''}"
+                            )
                             final_text += block.text
 
                     elif isinstance(block, ToolUseBlock):
@@ -245,7 +254,7 @@ async def run_autonomous_research(request: ResearchRequest) -> dict:
                         if tool_name == "web_search":
                             stats["searches"] += 1
                             query_text = block.input.get("query", "")[:50]
-                            print(f"\n[Tool] web_search: \"{query_text}...\"")
+                            print(f'\n[Tool] web_search: "{query_text}..."')
                         elif tool_name == "download_pdfs":
                             urls = block.input.get("urls", [])
                             stats["downloads"] += len(urls)
@@ -309,6 +318,7 @@ async def run_autonomous_research(request: ResearchRequest) -> dict:
 # Interactive Input Collection
 # =============================================================================
 
+
 def collect_research_request() -> ResearchRequest:
     """Collect research parameters from user interactively."""
 
@@ -342,7 +352,9 @@ def collect_research_request() -> ResearchRequest:
 
     # Depth
     print("\n" + "-" * 40)
-    depth_input = input("Research Depth [quick/standard/deep] (default: standard):\n> ").strip().lower()
+    depth_input = (
+        input("Research Depth [quick/standard/deep] (default: standard):\n> ").strip().lower()
+    )
     depth = depth_input if depth_input in ["quick", "standard", "deep"] else "standard"
 
     # Max papers
@@ -391,6 +403,7 @@ def collect_research_request() -> ResearchRequest:
 # Example Requests
 # =============================================================================
 
+
 def get_example_request() -> ResearchRequest:
     """Return an example research request for testing."""
     return ResearchRequest(
@@ -417,6 +430,7 @@ contribute to the model's ability to predict protein structures, including:
 # =============================================================================
 # Main Entry Point
 # =============================================================================
+
 
 async def main():
     """Main entry point with menu options."""

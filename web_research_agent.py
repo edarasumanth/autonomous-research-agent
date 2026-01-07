@@ -28,9 +28,11 @@ from web_research_tools import web_research_tools_server, ResearchConfig
 # Research Request Data Structure
 # =============================================================================
 
+
 @dataclass
 class ResearchRequest:
     """Structured input for autonomous research agent."""
+
     topic: str
     background: str
     depth: Literal["quick", "standard", "deep"] = "standard"
@@ -45,6 +47,7 @@ class ResearchRequest:
 @dataclass
 class ResearchProgress:
     """Track research progress for UI updates."""
+
     status: str = "initializing"
     phase: str = ""
     searches: int = 0
@@ -105,7 +108,9 @@ def format_research_request(request: ResearchRequest) -> str:
     """Format the research request as a prompt."""
     domains_str = ", ".join(request.domains) if request.domains else "All relevant academic domains"
     time_str = request.time_period or "Any time period"
-    criteria_str = request.completion_criteria or "Agent determines completion based on standard criteria"
+    criteria_str = (
+        request.completion_criteria or "Agent determines completion based on standard criteria"
+    )
 
     depth_descriptions = {
         "quick": "Quick overview - find 2-3 key papers and summarize main points",
@@ -142,10 +147,11 @@ Begin autonomous research now. Execute completely without asking questions. Use 
 # Main Research Function
 # =============================================================================
 
+
 async def run_web_research(
     request: ResearchRequest,
     progress_callback: Callable[[ResearchProgress], None] | None = None,
-    base_dir: str = "research_sessions"
+    base_dir: str = "research_sessions",
 ) -> dict:
     """
     Execute autonomous research with progress callbacks for web UI.
@@ -215,7 +221,11 @@ async def run_web_research(
                     for block in message.content:
                         if isinstance(block, TextBlock):
                             if block.text.strip():
-                                short_text = block.text[:100] + "..." if len(block.text) > 100 else block.text
+                                short_text = (
+                                    block.text[:100] + "..."
+                                    if len(block.text) > 100
+                                    else block.text
+                                )
                                 log(f"Agent: {short_text}")
 
                         elif isinstance(block, ToolUseBlock):
@@ -227,7 +237,7 @@ async def run_web_research(
                                 progress.searches += 1
                                 query = block.input.get("query", "")[:50]
                                 progress.current_action = f"Searching: {query}..."
-                                log(f"🔍 Web search: \"{query}...\"")
+                                log(f'🔍 Web search: "{query}..."')
 
                             elif tool_name == "download_pdfs":
                                 urls = block.input.get("urls", [])
@@ -287,7 +297,7 @@ async def run_web_research(
                             "pdfs_read": progress.pdfs_read,
                             "notes_saved": progress.notes_saved,
                             "report_generated": progress.report_generated,
-                        }
+                        },
                     }
                     with open(os.path.join(session_dir, "completion.json"), "w") as f:
                         json.dump(completion_data, f, indent=2)
@@ -307,7 +317,7 @@ async def run_web_research(
                             "pdfs_read": progress.pdfs_read,
                             "notes_saved": progress.notes_saved,
                             "report_generated": progress.report_generated,
-                        }
+                        },
                     }
 
     except Exception as e:
@@ -325,7 +335,7 @@ async def run_web_research(
                 "pdfs_read": progress.pdfs_read,
                 "notes_saved": progress.notes_saved,
                 "report_generated": progress.report_generated,
-            }
+            },
         }
 
     return {"session_dir": session_dir, "stats": {}}
@@ -334,6 +344,7 @@ async def run_web_research(
 # =============================================================================
 # Session Management Utilities
 # =============================================================================
+
 
 def list_research_sessions(base_dir: str = "research_sessions") -> list[dict]:
     """List all research sessions with metadata."""

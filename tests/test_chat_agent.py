@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from chat_research_agent import chat_with_agent
 
+
 async def test_chat():
     print("Testing chat agent...")
     print()
@@ -35,7 +36,9 @@ async def test_chat():
     except Exception as e:
         print(f"\nERROR: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     asyncio.run(test_chat())

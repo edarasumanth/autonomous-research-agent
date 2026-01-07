@@ -114,9 +114,11 @@ The user has completed research on a specific topic. You have access to:
 # Chat Message Types
 # =============================================================================
 
+
 @dataclass
 class ChatMessage:
     """A single chat message."""
+
     role: str  # "user", "assistant", "system", "tool"
     content: str
     timestamp: datetime = field(default_factory=datetime.now)
@@ -127,6 +129,7 @@ class ChatMessage:
 @dataclass
 class ChatSession:
     """A chat session with message history."""
+
     session_id: str
     messages: list[ChatMessage] = field(default_factory=list)
     research_session_path: str | None = None
@@ -137,6 +140,7 @@ class ChatSession:
 # =============================================================================
 # Streaming Chat Function
 # =============================================================================
+
 
 async def chat_with_agent(
     user_message: str,
@@ -170,7 +174,7 @@ async def chat_with_agent(
 
         system_prompt = FOLLOWUP_CHAT_SYSTEM_PROMPT.format(
             report_content=report[:10000],  # Limit to avoid context overflow
-            papers_list=papers_list
+            papers_list=papers_list,
         )
 
         # In followup mode, we don't need research tools
@@ -249,11 +253,16 @@ async def chat_with_agent(
 
                 elif isinstance(message, ResultMessage):
                     # End of response - capture cost info
-                    if on_complete and hasattr(message, 'duration_ms') and hasattr(message, 'total_cost_usd'):
+                    if (
+                        on_complete
+                        and hasattr(message, "duration_ms")
+                        and hasattr(message, "total_cost_usd")
+                    ):
                         on_complete(message.duration_ms, message.total_cost_usd)
 
     except Exception as e:
         import traceback
+
         error_tb = traceback.format_exc()
         yield f"\n\n❌ Error: {str(e)}\n\n```\n{error_tb}\n```"
 
@@ -261,6 +270,7 @@ async def chat_with_agent(
 # =============================================================================
 # Synchronous Wrapper for Streamlit
 # =============================================================================
+
 
 def run_chat_sync(
     user_message: str,
@@ -280,11 +290,7 @@ def run_chat_sync(
     async def run():
         chunks = []
         async for chunk in chat_with_agent(
-            user_message,
-            chat_history,
-            mode,
-            research_session_path,
-            on_tool
+            user_message, chat_history, mode, research_session_path, on_tool
         ):
             chunks.append(chunk)
         return "".join(chunks)
@@ -296,6 +302,7 @@ def run_chat_sync(
 # =============================================================================
 # Quick Research via Chat
 # =============================================================================
+
 
 async def quick_research_chat(
     topic: str,

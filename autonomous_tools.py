@@ -25,6 +25,7 @@ from tools import web_search, download_pdfs
 # PDF Reading Tool
 # =============================================================================
 
+
 async def _read_pdf_impl(args: dict) -> dict:
     """Extract text content from a PDF file in the papers folder."""
     filename = args["filename"]
@@ -38,7 +39,9 @@ async def _read_pdf_impl(args: dict) -> dict:
 
     if not os.path.exists(filepath):
         return {
-            "content": [{"type": "text", "text": f"Error: PDF file '{filename}' not found in papers folder"}],
+            "content": [
+                {"type": "text", "text": f"Error: PDF file '{filename}' not found in papers folder"}
+            ],
             "is_error": True,
         }
 
@@ -58,14 +61,22 @@ async def _read_pdf_impl(args: dict) -> dict:
 
         if not extracted_text:
             return {
-                "content": [{"type": "text", "text": f"Warning: No text could be extracted from '{filename}'. The PDF may be image-based or encrypted."}],
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"Warning: No text could be extracted from '{filename}'. The PDF may be image-based or encrypted.",
+                    }
+                ],
             }
 
         full_text = "\n\n".join(extracted_text)
 
         # Truncate if extremely long (keep first 50000 chars)
         if len(full_text) > 50000:
-            full_text = full_text[:50000] + f"\n\n[... Truncated. Total pages: {total_pages}, Read: {page_count} ...]"
+            full_text = (
+                full_text[:50000]
+                + f"\n\n[... Truncated. Total pages: {total_pages}, Read: {page_count} ...]"
+            )
 
         result_text = f"PDF: {filename}\nPages read: {page_count}/{total_pages}\n\n{full_text}"
 
@@ -75,7 +86,12 @@ async def _read_pdf_impl(args: dict) -> dict:
 
     except Exception as e:
         return {
-            "content": [{"type": "text", "text": f"Error reading PDF '{filename}': {str(e)}. The file may be corrupted or password-protected."}],
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Error reading PDF '{filename}': {str(e)}. The file may be corrupted or password-protected.",
+                }
+            ],
             "is_error": True,
         }
 
@@ -143,7 +159,12 @@ async def _save_note_impl(args: dict) -> dict:
             json.dump(note, f, indent=2, ensure_ascii=False)
 
         return {
-            "content": [{"type": "text", "text": f"Note saved: {filename}\nType: {note_type}\nTitle: {title}"}],
+            "content": [
+                {
+                    "type": "text",
+                    "text": f"Note saved: {filename}\nType: {note_type}\nTitle: {title}",
+                }
+            ],
         }
 
     except Exception as e:
@@ -195,6 +216,7 @@ save_note = tool(
 # Read Notes Tool
 # =============================================================================
 
+
 async def _read_notes_impl(args: dict) -> dict:
     """Read all saved research notes."""
     note_type_filter = args.get("note_type", "all")
@@ -202,7 +224,9 @@ async def _read_notes_impl(args: dict) -> dict:
 
     if not os.path.exists(NOTES_DIR):
         return {
-            "content": [{"type": "text", "text": "No notes found. The notes folder does not exist yet."}],
+            "content": [
+                {"type": "text", "text": "No notes found. The notes folder does not exist yet."}
+            ],
         }
 
     notes = []
@@ -229,7 +253,12 @@ async def _read_notes_impl(args: dict) -> dict:
 
         if not notes:
             return {
-                "content": [{"type": "text", "text": f"No notes found matching filters (type: {note_type_filter}, tags: {tag_filter})"}],
+                "content": [
+                    {
+                        "type": "text",
+                        "text": f"No notes found matching filters (type: {note_type_filter}, tags: {tag_filter})",
+                    }
+                ],
             }
 
         # Format notes for output
@@ -282,6 +311,7 @@ read_notes = tool(
 # =============================================================================
 # Write Report Tool
 # =============================================================================
+
 
 async def _write_report_impl(args: dict) -> dict:
     """Generate and save the final research report."""
@@ -421,11 +451,11 @@ autonomous_tools_server = create_sdk_mcp_server(
     name="autonomous_research",
     version="1.0.0",
     tools=[
-        web_search,      # From tools.py
-        download_pdfs,   # From tools.py
-        read_pdf,        # New
-        save_note,       # New
-        read_notes,      # New
-        write_report,    # New
+        web_search,  # From tools.py
+        download_pdfs,  # From tools.py
+        read_pdf,  # New
+        save_note,  # New
+        read_notes,  # New
+        write_report,  # New
     ],
 )

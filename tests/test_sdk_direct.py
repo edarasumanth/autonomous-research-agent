@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
 
+
 async def test_sdk():
     print("Testing Claude SDK connection...")
     print(f"Python: {sys.executable}")
@@ -37,7 +38,9 @@ async def test_sdk():
     except Exception as e:
         print(f"\nERROR: {type(e).__name__}: {e}")
         import traceback
+
         traceback.print_exc()
+
 
 if __name__ == "__main__":
     asyncio.run(test_sdk())

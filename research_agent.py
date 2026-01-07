@@ -45,6 +45,7 @@ from tools import research_tools_server, list_downloaded_pdfs
 # APPROACH 1: Stateless Research (query) - No memory between calls
 # =============================================================================
 
+
 async def stateless_research_query(prompt: str, system_prompt: str = None) -> str:
     """
     Execute a single research query using the stateless query() approach.
@@ -80,6 +81,7 @@ async def stateless_research_query(prompt: str, system_prompt: str = None) -> st
 # =============================================================================
 # APPROACH 2: Conversational Research (ClaudeSDKClient) - Memory across turns
 # =============================================================================
+
 
 class ConversationalResearchAgent:
     """
@@ -138,6 +140,7 @@ class ConversationalResearchAgent:
 # EXAMPLE 1: Stateless Research Session (No Memory)
 # =============================================================================
 
+
 async def run_stateless_example():
     """Demonstrate stateless queries - each query is independent."""
 
@@ -161,7 +164,7 @@ in a clear and accessible manner. When discussing health topics:
     print("-" * 40)
     response = await stateless_research_query(
         prompt="Explain how the human body digests protein in 2-3 paragraphs.",
-        system_prompt=health_research_prompt
+        system_prompt=health_research_prompt,
     )
     print(response)
     print()
@@ -172,7 +175,7 @@ in a clear and accessible manner. When discussing health topics:
     print("(Note: This query has NO context from Query 1)")
     response = await stateless_research_query(
         prompt="What happens in the stomach?",  # Vague without context
-        system_prompt=health_research_prompt
+        system_prompt=health_research_prompt,
     )
     print(response)
     print()
@@ -181,6 +184,7 @@ in a clear and accessible manner. When discussing health topics:
 # =============================================================================
 # EXAMPLE 2: Conversational Research Session (With Memory)
 # =============================================================================
+
 
 async def run_conversational_example():
     """Demonstrate conversational research - Claude remembers context."""
@@ -209,9 +213,7 @@ caveats and recommend consulting professionals when appropriate."""
         # Turn 2: Follow-up - Claude remembers we're discussing protein digestion
         print("TURN 2: Follow-up question (Claude remembers context)")
         print("-" * 40)
-        response = await agent.ask(
-            "What happens specifically in the stomach?"
-        )
+        response = await agent.ask("What happens specifically in the stomach?")
         print(response)
         print()
 
@@ -246,6 +248,7 @@ caveats and recommend consulting professionals when appropriate."""
 # EXAMPLE 3: Interactive Research Session
 # =============================================================================
 
+
 async def run_interactive_example():
     """
     Run an interactive research session where the user can ask questions.
@@ -267,7 +270,7 @@ focused and conversational."""
             try:
                 user_input = input(f"\n[Turn {agent.turn_count + 1}] You: ").strip()
 
-                if user_input.lower() in ('quit', 'exit', 'q'):
+                if user_input.lower() in ("quit", "exit", "q"):
                     print(f"\nSession ended after {agent.turn_count} turns.")
                     break
 
@@ -287,6 +290,7 @@ focused and conversational."""
 # =============================================================================
 # EXAMPLE 4: Guided Analysis Session
 # =============================================================================
+
 
 async def run_guided_analysis():
     """
@@ -357,6 +361,7 @@ Be concise but thorough."""
 # EXAMPLE 5: Web Search and PDF Download (MCP Server Integration)
 # =============================================================================
 
+
 async def run_web_search_example():
     """
     Demonstrate the web search and PDF download tools using MCP server integration.
@@ -388,7 +393,7 @@ async def run_web_search_example():
             "message": {
                 "role": "user",
                 "content": f"Search for research papers about: {user_query}\n\n"
-                           f"After finding results, download any PDF files to the 'papers' folder."
+                f"After finding results, download any PDF files to the 'papers' folder.",
             },
             "parent_tool_use_id": None,
             "session_id": "default",
@@ -482,11 +487,11 @@ Be conversational and helpful. Summarize search results clearly.""",
             try:
                 user_input = input(f"\n[Turn {turn_count + 1}] You: ").strip()
 
-                if user_input.lower() in ('quit', 'exit', 'q'):
+                if user_input.lower() in ("quit", "exit", "q"):
                     print(f"\nSession ended after {turn_count} turns.")
                     break
 
-                if user_input.lower() == 'list':
+                if user_input.lower() == "list":
                     pdfs = list_downloaded_pdfs()
                     if pdfs:
                         print(f"\nDownloaded PDFs ({len(pdfs)} files):")
@@ -526,6 +531,7 @@ Be conversational and helpful. Summarize search results clearly.""",
 # =============================================================================
 # Main Entry Point
 # =============================================================================
+
 
 async def main():
     """Run the research agent examples."""

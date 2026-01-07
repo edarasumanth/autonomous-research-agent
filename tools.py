@@ -21,6 +21,7 @@ from claude_agent_sdk import tool, create_sdk_mcp_server
 # Tavily Search Tool
 # =============================================================================
 
+
 async def _web_search_impl(args: dict) -> dict:
     """Search for research papers and articles using Tavily API."""
     query = args["query"]
@@ -162,6 +163,7 @@ def _is_pdf_url(url: str) -> bool:
 # PDF Downloader Tool
 # =============================================================================
 
+
 async def _download_pdfs_impl(args: dict) -> dict:
     """Download PDFs from a list of URLs."""
     urls = args["urls"]
@@ -213,7 +215,9 @@ async def _download_pdfs_impl(args: dict) -> dict:
                 size_mb = result.get("file_size_mb", 0)
                 output_lines.append(f"  ✅ {result['filename']} ({size_mb} MB)")
         else:
-            output_lines.append(f"  ❌ {result.get('filename', 'unknown')}: {result.get('error', 'Unknown error')}")
+            output_lines.append(
+                f"  ❌ {result.get('filename', 'unknown')}: {result.get('error', 'Unknown error')}"
+            )
 
     return {
         "content": [{"type": "text", "text": "\n".join(output_lines)}],
@@ -261,9 +265,7 @@ async def _download_single_pdf(url: str, output_dir: str) -> dict:
         async with httpx.AsyncClient(
             timeout=60,
             follow_redirects=True,
-            headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            }
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"},
         ) as client:
             response = await client.get(url)
             response.raise_for_status()
@@ -296,7 +298,12 @@ async def _download_single_pdf(url: str, output_dir: str) -> dict:
     except httpx.TimeoutException:
         return {"success": False, "url": url, "filename": filename, "error": "Timeout"}
     except httpx.HTTPStatusError as e:
-        return {"success": False, "url": url, "filename": filename, "error": f"HTTP {e.response.status_code}"}
+        return {
+            "success": False,
+            "url": url,
+            "filename": filename,
+            "error": f"HTTP {e.response.status_code}",
+        }
     except Exception as e:
         return {"success": False, "url": url, "filename": filename, "error": str(e)}
 
@@ -313,6 +320,7 @@ def _extract_filename_from_url(url: str) -> str:
             filename = f"{parts[-1]}.pdf"
         else:
             import hashlib
+
             url_hash = hashlib.md5(url.encode()).hexdigest()[:8]
             filename = f"{parsed.netloc}_{url_hash}.pdf"
 
