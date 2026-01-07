@@ -6,6 +6,7 @@
 venv/
 .venv/
 env/
+.env
 .env.local
 
 # Python cache
@@ -14,6 +15,11 @@ __pycache__/
 *$py.class
 *.so
 .Python
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
 
 # IDE
 .idea/
@@ -24,19 +30,28 @@ __pycache__/
 # Git
 .git/
 .gitignore
+.github/
 
-# Docker
-Dockerfile
+# Docker files (not needed in image)
+Dockerfile.dev
 docker-compose*.yml
 .docker/
 
 # Test files
+tests/
 test_*.py
 *_test.py
+.pytest_cache/
+.coverage
+htmlcov/
 
-# Documentation (optional - comment out if you want docs in image)
+# Documentation
 *.md
 docs/
+CLAUDE.md
+
+# Claude Code
+.claude/
 
 # OS files
 .DS_Store
@@ -49,6 +64,8 @@ logs/
 # Local development files
 .env.local
 .env.development
+Makefile
 
-# Research sessions (mounted as volume instead)
-# research_sessions/
+# Research data (mounted as volumes)
+research_sessions/
+papers/
