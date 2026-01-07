@@ -2,7 +2,6 @@
 Pytest configuration and fixtures for the Research Agent test suite.
 """
 
-import os
 import sys
 from pathlib import Path
 

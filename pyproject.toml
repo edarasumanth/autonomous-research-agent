@@ -79,8 +79,13 @@ target-version = ["py311"]
 [tool.ruff]
 line-length = 100
 target-version = "py311"
-select = ["E", "F", "I", "N", "W"]
-ignore = ["E501"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = [
+    "E501",  # Line too long (handled by black)
+    "E402",  # Module level import not at top of file (intentional in some files)
+]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"

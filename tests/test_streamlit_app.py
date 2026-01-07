@@ -5,15 +5,12 @@ These tests verify the app's helper functions and session management.
 """
 
 import json
-import os
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-import pytest
 
 # Add parent directory to path for imports
 import sys
+from datetime import datetime
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 

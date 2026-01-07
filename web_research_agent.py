@@ -4,25 +4,22 @@ Web Research Agent
 Autonomous research agent for web interface with per-session folder support.
 """
 
-import asyncio
 import json
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Literal, Callable, Any
+from typing import Callable, Literal
 
 from claude_agent_sdk import (
-    ClaudeSDKClient,
-    ClaudeAgentOptions,
     AssistantMessage,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
+    ResultMessage,
     TextBlock,
     ToolUseBlock,
-    ToolResultBlock,
-    ResultMessage,
 )
 
-from web_research_tools import web_research_tools_server, ResearchConfig
-
+from web_research_tools import ResearchConfig, web_research_tools_server
 
 # =============================================================================
 # Research Request Data Structure

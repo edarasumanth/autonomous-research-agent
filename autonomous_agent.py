@@ -15,17 +15,16 @@ from datetime import datetime
 from typing import Literal
 
 from claude_agent_sdk import (
-    ClaudeSDKClient,
-    ClaudeAgentOptions,
     AssistantMessage,
-    TextBlock,
-    ToolUseBlock,
-    ToolResultBlock,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
     ResultMessage,
+    TextBlock,
+    ToolResultBlock,
+    ToolUseBlock,
 )
 
 from autonomous_tools import autonomous_tools_server
-
 
 # =============================================================================
 # Research Request Data Structure
@@ -269,7 +268,7 @@ async def run_autonomous_research(request: ResearchRequest) -> dict:
                             title = block.input.get("title", "")[:40]
                             print(f"\n[Tool] save_note: [{note_type}] {title}")
                         elif tool_name == "read_notes":
-                            print(f"\n[Tool] read_notes: Gathering all findings")
+                            print("\n[Tool] read_notes: Gathering all findings")
                         elif tool_name == "write_report":
                             stats["report_generated"] = True
                             title = block.input.get("title", "")[:50]
@@ -296,7 +295,7 @@ async def run_autonomous_research(request: ResearchRequest) -> dict:
                 print(f"API Time: {duration_sec:.1f} seconds")
                 print(f"Cost: ${cost:.4f}" if cost else "Cost: N/A")
                 print(f"Turns: {message.num_turns}")
-                print(f"\nStatistics:")
+                print("\nStatistics:")
                 print(f"  - Web searches: {stats['searches']}")
                 print(f"  - PDFs downloaded: {stats['downloads']}")
                 print(f"  - PDFs analyzed: {stats['pdfs_read']}")
@@ -472,7 +471,7 @@ async def main():
         return
 
     # Run the research
-    result = await run_autonomous_research(request)
+    await run_autonomous_research(request)
 
     print("\n" + "=" * 70)
     print("Done! Check the papers/ folder for:")

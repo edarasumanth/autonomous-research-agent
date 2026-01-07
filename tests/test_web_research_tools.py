@@ -7,26 +7,26 @@ Tests call the implementation functions directly (_*_impl functions).
 
 import json
 import os
+
+# Add parent directory to path for imports
+import sys
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-# Add parent directory to path for imports
-import sys
-
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from web_research_tools import (
     ResearchConfig,
-    _web_search_impl,
     _download_pdfs_impl,
+    _extract_filename_from_url,
+    _is_pdf_url,
+    _read_notes_impl,
     _read_pdf_impl,
     _save_note_impl,
-    _read_notes_impl,
+    _web_search_impl,
     _write_report_impl,
-    _is_pdf_url,
-    _extract_filename_from_url,
 )
 
 
@@ -420,7 +420,7 @@ class TestIntegration:
         assert "2 notes" in notes_result["content"][0]["text"]
 
         # Write report
-        report_result = await _write_report_impl(
+        await _write_report_impl(
             {
                 "title": "Research Summary",
                 "executive_summary": "This is a summary of findings.",

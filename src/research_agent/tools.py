@@ -6,16 +6,11 @@ Tools for web search and PDF downloading using Claude Agent SDK's @tool decorato
 
 import os
 import re
-import asyncio
-import json
-from typing import Optional
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 import httpx
+from claude_agent_sdk import create_sdk_mcp_server, tool
 from tavily import TavilyClient
-
-from claude_agent_sdk import tool, create_sdk_mcp_server
-
 
 # =============================================================================
 # Tavily Search Tool
@@ -96,7 +91,7 @@ async def _web_search_impl(args: dict) -> dict:
             output_lines.append(f"   {content}...")
 
         if pdf_urls:
-            output_lines.append(f"\n\nPDF URLs for download:")
+            output_lines.append("\n\nPDF URLs for download:")
             for url in pdf_urls:
                 output_lines.append(f"  - {url}")
 
@@ -197,7 +192,7 @@ async def _download_pdfs_impl(args: dict) -> dict:
 
     # Format output
     output_lines = [
-        f"Download Summary:",
+        "Download Summary:",
         f"  Total: {len(urls)}",
         f"  Successful: {successful}",
         f"  Failed: {failed}",

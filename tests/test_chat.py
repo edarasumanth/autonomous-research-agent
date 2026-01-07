@@ -1,8 +1,8 @@
 """Quick test of the chat research interface."""
 
 import asyncio
-import sys
 import io
+import sys
 
 # Fix Windows console encoding for Unicode/emojis
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
@@ -38,7 +38,7 @@ async def main():
     print("RESEARCH COMPLETE")
     print("=" * 60)
     print(f"\nSession folder: {result['session_dir']}")
-    print(f"\nStats:")
+    print("\nStats:")
     print(f"  - Searches: {result['stats']['searches']}")
     print(f"  - Downloads: {result['stats']['downloads']}")
     print(f"  - PDFs Read: {result['stats']['reads']}")

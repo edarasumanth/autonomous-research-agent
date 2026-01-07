@@ -1,8 +1,8 @@
 """Test chat agent directly to diagnose the error."""
 
 import asyncio
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 

@@ -8,18 +8,15 @@ Extended tools for fully autonomous research workflow:
 - write_report: Generate final markdown research report
 """
 
-import os
 import json
+import os
 from datetime import datetime
-from typing import Any
 
 import pdfplumber
-
-from claude_agent_sdk import tool, create_sdk_mcp_server
+from claude_agent_sdk import create_sdk_mcp_server, tool
 
 # Import existing tools from tools.py
-from tools import web_search, download_pdfs
-
+from tools import download_pdfs, web_search
 
 # =============================================================================
 # PDF Reading Tool

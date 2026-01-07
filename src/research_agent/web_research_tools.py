@@ -4,20 +4,17 @@ Web Research Tools with Configurable Output Directory
 Tools for the web-based autonomous research agent with per-session folder support.
 """
 
+import json
 import os
 import re
-import json
 import threading
 from datetime import datetime
-from typing import Optional
-from urllib.parse import urlparse, unquote
+from urllib.parse import unquote, urlparse
 
 import httpx
 import pdfplumber
+from claude_agent_sdk import create_sdk_mcp_server, tool
 from tavily import TavilyClient
-
-from claude_agent_sdk import tool, create_sdk_mcp_server
-
 
 # =============================================================================
 # Configuration - Thread-safe output directory management
@@ -143,7 +140,7 @@ async def _web_search_impl(args: dict) -> dict:
             output_lines.extend([f"\n{i}. {title} {is_pdf}", f"   URL: {url}", f"   {content}..."])
 
         if pdf_urls:
-            output_lines.append(f"\n\nPDF URLs for download:")
+            output_lines.append("\n\nPDF URLs for download:")
             output_lines.extend(f"  - {url}" for url in pdf_urls)
 
         return {"content": [{"type": "text", "text": "\n".join(output_lines)}]}
@@ -223,7 +220,7 @@ async def _download_single_pdf(url: str, output_dir: str) -> dict:
                         "success": False,
                         "url": url,
                         "filename": filename,
-                        "error": f"Not a PDF",
+                        "error": "Not a PDF",
                     }
 
             with open(filepath, "wb") as f:
@@ -274,7 +271,7 @@ async def _download_pdfs_impl(args: dict) -> dict:
             failed += 1
 
     output_lines = [
-        f"Download Summary:",
+        "Download Summary:",
         f"  Total: {len(urls)}, Successful: {successful}, Failed: {failed}, Skipped: {skipped}",
         f"  Output folder: {output_dir}/",
         "",
@@ -354,7 +351,7 @@ async def _read_pdf_impl(args: dict) -> dict:
 
         full_text = "\n\n".join(extracted_text)
         if len(full_text) > 50000:
-            full_text = full_text[:50000] + f"\n\n[... Truncated ...]"
+            full_text = full_text[:50000] + "\n\n[... Truncated ...]"
 
         return {
             "content": [

@@ -141,7 +141,7 @@ async def run_research(args):
         )
 
         result = await run_autonomous_research(request)
-        print(f"\nResearch complete!")
+        print("\nResearch complete!")
         print(f"Report saved to: {result.get('report_path', 'N/A')}")
 
     except ImportError as e:

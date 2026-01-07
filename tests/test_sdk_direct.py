@@ -7,7 +7,7 @@ import sys
 # Add project to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
+from claude_agent_sdk import ClaudeAgentOptions, ClaudeSDKClient
 
 
 async def test_sdk():

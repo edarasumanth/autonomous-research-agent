@@ -14,9 +14,8 @@ Usage:
 """
 
 import asyncio
-import sys
-import json
 import os
+import sys
 
 from dotenv import load_dotenv
 
@@ -28,18 +27,17 @@ if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
 from claude_agent_sdk import (
-    query,
-    ClaudeSDKClient,
-    ClaudeAgentOptions,
     AssistantMessage,
-    TextBlock,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
     ResultMessage,
-    ToolUseBlock,
+    TextBlock,
     ToolResultBlock,
+    ToolUseBlock,
+    query,
 )
 
-from tools import research_tools_server, list_downloaded_pdfs
-
+from tools import list_downloaded_pdfs, research_tools_server
 
 # =============================================================================
 # APPROACH 1: Stateless Research (query) - No memory between calls

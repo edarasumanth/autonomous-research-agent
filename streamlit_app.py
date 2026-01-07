@@ -20,8 +20,6 @@ if npm_path not in os.environ.get("PATH", ""):
     os.environ["PATH"] = npm_path + os.pathsep + os.environ.get("PATH", "")
 
 import asyncio
-
-import streamlit as st
 import base64
 import json
 import random
@@ -29,22 +27,20 @@ import shutil
 import traceback
 from datetime import datetime
 
+import streamlit as st
 from dotenv import load_dotenv
 
 load_dotenv()
 
+from chat_research_agent import chat_with_agent
 from web_research_agent import (
     ResearchRequest,
-    ResearchProgress,
-    run_web_research,
-    list_research_sessions,
-    get_session_report,
-    get_session_pdfs,
     get_pdf_path,
+    get_session_pdfs,
+    get_session_report,
+    list_research_sessions,
+    run_web_research,
 )
-
-from chat_research_agent import chat_with_agent, quick_research_chat
-
 
 # =============================================================================
 # Page Configuration
@@ -358,7 +354,7 @@ with st.sidebar:
                     for session in valid_sessions:
                         try:
                             shutil.rmtree(session["path"])
-                        except:
+                        except Exception:
                             pass
                     st.session_state.confirm_clear = False
                     st.session_state.selected_session = None
@@ -381,7 +377,7 @@ with st.sidebar:
                 date_str = session["folder"][:15]
                 date = datetime.strptime(date_str, "%Y%m%d_%H%M%S")
                 date_display = date.strftime("%b %d, %H:%M")
-            except:
+            except (ValueError, KeyError):
                 date_display = ""
 
             topic = session.get("metadata", {}).get("topic", session["topic"])

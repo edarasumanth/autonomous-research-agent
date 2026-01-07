@@ -6,25 +6,23 @@ Supports both research initiation and follow-up Q&A about completed research.
 """
 
 import asyncio
-import os
 import json
-from datetime import datetime
+import os
 from dataclasses import dataclass, field
+from datetime import datetime
 from typing import AsyncGenerator, Callable
 
 from claude_agent_sdk import (
-    ClaudeSDKClient,
-    ClaudeAgentOptions,
     AssistantMessage,
+    ClaudeAgentOptions,
+    ClaudeSDKClient,
+    ResultMessage,
     TextBlock,
     ToolUseBlock,
-    ToolResultBlock,
-    ResultMessage,
 )
 
-from web_research_tools import web_research_tools_server, ResearchConfig
-from web_research_agent import ResearchRequest, get_session_report, get_session_pdfs
-
+from web_research_agent import get_session_pdfs, get_session_report
+from web_research_tools import ResearchConfig, web_research_tools_server
 
 # =============================================================================
 # Chat System Prompts
@@ -182,8 +180,6 @@ async def chat_with_agent(
             ResearchConfig.set_output_dir(research_session_path)
         else:
             # Create new session folder
-            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            session_dir = os.path.join("research_sessions", f"{timestamp}_chat_research")
             ResearchConfig.create_session_folder("chat_research", "research_sessions")
 
         options = ClaudeAgentOptions(
@@ -242,7 +238,7 @@ async def chat_with_agent(
                                 title = block.input.get("title", "")[:40]
                                 yield f"\n\n📝 *Saving note: {title}*\n\n"
                             elif tool_name == "write_report":
-                                yield f"\n\n📄 *Generating report...*\n\n"
+                                yield "\n\n📄 *Generating report...*\n\n"
 
                 elif isinstance(message, ResultMessage):
                     # End of response
