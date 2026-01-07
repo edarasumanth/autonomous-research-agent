@@ -228,6 +228,18 @@ docker build -t research-agent .
 docker run -p 8501:8501 --env-file .env research-agent
 ```
 
+### Development Guide
+
+For a comprehensive step-by-step guide on how this application was built, see the **[Development Guide](docs/DEVELOPMENT_GUIDE.md)**. It covers:
+
+- Project setup and prerequisites
+- Claude Agent SDK installation
+- Creating MCP research tools
+- Building the chat agent
+- Creating the Streamlit UI
+- Docker configuration
+- Testing and debugging
+
 ## Architecture
 
 The application uses the Claude Agent SDK with MCP (Model Context Protocol) tools:
