@@ -8,6 +8,12 @@
 
 An AI-powered research assistant built with the Claude Agent SDK. This application autonomously searches for academic papers, downloads PDFs, analyzes content, and generates comprehensive research reports.
 
+## Demo
+
+<!-- TODO: Add demo GIF showing research workflow -->
+![Demo](docs/screenshots/demo.gif)
+*Watch the agent search, analyze papers, and generate a comprehensive report*
+
 ## Screenshots
 
 ### Welcome Screen
