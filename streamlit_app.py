@@ -360,82 +360,83 @@ if st.session_state.current_view == "chat":
         # Generate response
         with st.chat_message("assistant"):
             response_placeholder = st.empty()
-            response_placeholder.markdown("🔬 *Researching... please wait...*")
             response_container = [""]
 
             # Check if this is a research request
             research_keywords = ["research", "find papers", "search for", "look up", "investigate", "explore", "learn about", "tell me about"]
             is_research = any(kw in prompt.lower() for kw in research_keywords)
 
-            try:
-                # Create session folder if research-like query
-                if is_research and not st.session_state.chat_session_path:
-                    from web_research_tools import ResearchConfig
-                    topic_words = prompt.split()[:5]
-                    topic_slug = "_".join(topic_words)[:30]
-                    st.session_state.chat_session_path = ResearchConfig.create_session_folder(
-                        topic_slug, "research_sessions"
-                    )
-                    # Save metadata for chat session
-                    chat_metadata = {
-                        "topic": " ".join(topic_words),
-                        "mode": "chat",
-                        "model": st.session_state.chat_model,
-                        "created_at": datetime.now().isoformat(),
-                    }
-                    with open(os.path.join(st.session_state.chat_session_path, "metadata.json"), "w") as f:
-                        json.dump(chat_metadata, f, indent=2)
-
-                import concurrent.futures
-
-                # Capture values before entering thread
-                chat_history = list(st.session_state.chat_messages[:-1])
-                session_path = st.session_state.chat_session_path
-
-                def run_async_chat(user_prompt, history, sess_path, chat_model):
-                    """Run the async chat using anyio for proper task context."""
-                    import anyio
-
-                    if sys.platform == "win32":
-                        asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
-
-                    async def collect_response():
-                        result = ""
-                        async for chunk in chat_with_agent(
-                            user_prompt,
-                            history,
-                            mode="research",
-                            research_session_path=sess_path,
-                            model=chat_model,
-                        ):
-                            result += chunk
-                        return result
-
-                    return anyio.run(collect_response, backend="asyncio", backend_options={"use_uvloop": False})
-
-                selected_model = st.session_state.chat_model
-                with concurrent.futures.ThreadPoolExecutor() as executor:
-                    future = executor.submit(run_async_chat, prompt, chat_history, session_path, selected_model)
-                    response_container[0] = future.result(timeout=300)
-
-                response_placeholder.markdown(response_container[0])
-
-                # Save completion.json if session exists and file doesn't exist yet
-                if st.session_state.chat_session_path:
-                    completion_path = os.path.join(st.session_state.chat_session_path, "completion.json")
-                    if not os.path.exists(completion_path):
-                        completion_data = {
-                            "completed_at": datetime.now().isoformat(),
+            # Show spinner while processing
+            with st.spinner("🔬 Researching... This may take a few minutes..."):
+                try:
+                    # Create session folder if research-like query
+                    if is_research and not st.session_state.chat_session_path:
+                        from web_research_tools import ResearchConfig
+                        topic_words = prompt.split()[:5]
+                        topic_slug = "_".join(topic_words)[:30]
+                        st.session_state.chat_session_path = ResearchConfig.create_session_folder(
+                            topic_slug, "research_sessions"
+                        )
+                        # Save metadata for chat session
+                        chat_metadata = {
+                            "topic": " ".join(topic_words),
                             "mode": "chat",
-                            "stats": {}
+                            "model": st.session_state.chat_model,
+                            "created_at": datetime.now().isoformat(),
                         }
-                        with open(completion_path, "w") as f:
-                            json.dump(completion_data, f, indent=2)
+                        with open(os.path.join(st.session_state.chat_session_path, "metadata.json"), "w") as f:
+                            json.dump(chat_metadata, f, indent=2)
 
-            except Exception as e:
-                error_details = traceback.format_exc()
-                response_container[0] = f"Error: {str(e)}\n\n```\n{error_details}\n```"
-                response_placeholder.markdown(response_container[0])
+                    import concurrent.futures
+
+                    # Capture values before entering thread
+                    chat_history = list(st.session_state.chat_messages[:-1])
+                    session_path = st.session_state.chat_session_path
+
+                    def run_async_chat(user_prompt, history, sess_path, chat_model):
+                        """Run the async chat using anyio for proper task context."""
+                        import anyio
+
+                        if sys.platform == "win32":
+                            asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+                        async def collect_response():
+                            result = ""
+                            async for chunk in chat_with_agent(
+                                user_prompt,
+                                history,
+                                mode="research",
+                                research_session_path=sess_path,
+                                model=chat_model,
+                            ):
+                                result += chunk
+                            return result
+
+                        return anyio.run(collect_response, backend="asyncio", backend_options={"use_uvloop": False})
+
+                    selected_model = st.session_state.chat_model
+                    with concurrent.futures.ThreadPoolExecutor() as executor:
+                        future = executor.submit(run_async_chat, prompt, chat_history, session_path, selected_model)
+                        response_container[0] = future.result(timeout=300)
+
+                    response_placeholder.markdown(response_container[0])
+
+                    # Save completion.json if session exists and file doesn't exist yet
+                    if st.session_state.chat_session_path:
+                        completion_path = os.path.join(st.session_state.chat_session_path, "completion.json")
+                        if not os.path.exists(completion_path):
+                            completion_data = {
+                                "completed_at": datetime.now().isoformat(),
+                                "mode": "chat",
+                                "stats": {}
+                            }
+                            with open(completion_path, "w") as f:
+                                json.dump(completion_data, f, indent=2)
+
+                except Exception as e:
+                    error_details = traceback.format_exc()
+                    response_container[0] = f"Error: {str(e)}\n\n```\n{error_details}\n```"
+                    response_placeholder.markdown(response_container[0])
 
             # Save assistant response
             st.session_state.chat_messages.append({"role": "assistant", "content": response_container[0]})
@@ -544,20 +545,22 @@ elif st.session_state.current_view == "structured":
             progress_data["reads"] = p.pdfs_read
             progress_data["notes"] = p.notes_saved
 
-        try:
-            result = asyncio.run(run_web_research(request, update_progress))
-            st.session_state.research_running = False
+        # Show spinner while research is running
+        with st.spinner("🔬 Research in progress... This may take several minutes..."):
+            try:
+                result = asyncio.run(run_web_research(request, update_progress))
+                st.session_state.research_running = False
 
-            if result.get("session_dir"):
-                sessions = list_research_sessions()
-                if sessions:
-                    switch_to_session(sessions[0])
-                st.success("✅ Research complete!")
-                st.rerun()
+                if result.get("session_dir"):
+                    sessions = list_research_sessions()
+                    if sessions:
+                        switch_to_session(sessions[0])
+                    st.success("✅ Research complete!")
+                    st.rerun()
 
-        except Exception as e:
-            st.session_state.research_running = False
-            st.error(f"Error: {str(e)}")
+            except Exception as e:
+                st.session_state.research_running = False
+                st.error(f"Error: {str(e)}")
 
 
 # =============================================================================
@@ -693,46 +696,48 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
                 placeholder = st.empty()
                 response_container = [""]  # Use mutable container for async access
 
-                try:
-                    import concurrent.futures
+                # Show spinner while processing
+                with st.spinner("💭 Thinking..."):
+                    try:
+                        import concurrent.futures
 
-                    # Capture values before entering thread
-                    followup_history = list(st.session_state[chat_key][:-1])
-                    sess_path = session["path"]
-                    sess_model = session.get("metadata", {}).get("model")
+                        # Capture values before entering thread
+                        followup_history = list(st.session_state[chat_key][:-1])
+                        sess_path = session["path"]
+                        sess_model = session.get("metadata", {}).get("model")
 
-                    def run_followup_chat(user_followup, history, path, followup_model):
-                        """Run the async followup chat using anyio."""
-                        import anyio
+                        def run_followup_chat(user_followup, history, path, followup_model):
+                            """Run the async followup chat using anyio."""
+                            import anyio
 
-                        # Set Windows event loop policy for subprocess support
-                        if sys.platform == "win32":
-                            asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+                            # Set Windows event loop policy for subprocess support
+                            if sys.platform == "win32":
+                                asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-                        async def collect_followup():
-                            result = ""
-                            async for chunk in chat_with_agent(
-                                user_followup,
-                                history,
-                                mode="followup",
-                                research_session_path=path,
-                                model=followup_model,
-                            ):
-                                result += chunk
-                            return result
+                            async def collect_followup():
+                                result = ""
+                                async for chunk in chat_with_agent(
+                                    user_followup,
+                                    history,
+                                    mode="followup",
+                                    research_session_path=path,
+                                    model=followup_model,
+                                ):
+                                    result += chunk
+                                return result
 
-                        return anyio.run(collect_followup, backend="asyncio", backend_options={"use_uvloop": False})
+                            return anyio.run(collect_followup, backend="asyncio", backend_options={"use_uvloop": False})
 
-                    with concurrent.futures.ThreadPoolExecutor() as executor:
-                        future = executor.submit(run_followup_chat, followup, followup_history, sess_path, sess_model)
-                        response_container[0] = future.result(timeout=300)
+                        with concurrent.futures.ThreadPoolExecutor() as executor:
+                            future = executor.submit(run_followup_chat, followup, followup_history, sess_path, sess_model)
+                            response_container[0] = future.result(timeout=300)
 
-                    placeholder.markdown(response_container[0])
+                        placeholder.markdown(response_container[0])
 
-                except Exception as e:
-                    error_details = traceback.format_exc()
-                    response_container[0] = f"Error: {str(e)}\n\n```\n{error_details}\n```"
-                    placeholder.markdown(response_container[0])
+                    except Exception as e:
+                        error_details = traceback.format_exc()
+                        response_container[0] = f"Error: {str(e)}\n\n```\n{error_details}\n```"
+                        placeholder.markdown(response_container[0])
 
                 st.session_state[chat_key].append({"role": "assistant", "content": response_container[0]})
 
