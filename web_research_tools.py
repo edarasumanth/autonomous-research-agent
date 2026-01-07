@@ -11,6 +11,7 @@ import threading
 from datetime import datetime
 from urllib.parse import unquote, urlparse
 
+import arxiv
 import httpx
 import pdfplumber
 from claude_agent_sdk import create_sdk_mcp_server, tool
@@ -161,6 +162,143 @@ web_search = tool(
         "required": ["query"],
     },
 )(_web_search_impl)
+
+
+# =============================================================================
+# ArXiv Search Tool
+# =============================================================================
+
+
+async def _arxiv_search_impl(args: dict) -> dict:
+    """Search ArXiv for academic papers."""
+    query = args["query"]
+    max_results = args.get("max_results", 10)
+    sort_by = args.get("sort_by", "relevance")
+    category = args.get("category", None)
+
+    try:
+        # Build search query
+        search_query = query
+        if category:
+            search_query = f"cat:{category} AND {query}"
+
+        # Configure sort order
+        sort_criterion = arxiv.SortCriterion.Relevance
+        if sort_by == "date":
+            sort_criterion = arxiv.SortCriterion.SubmittedDate
+        elif sort_by == "citations":
+            sort_criterion = arxiv.SortCriterion.Relevance  # ArXiv doesn't have citation sort
+
+        # Create search client
+        client = arxiv.Client()
+        search = arxiv.Search(
+            query=search_query,
+            max_results=max_results,
+            sort_by=sort_criterion,
+            sort_order=arxiv.SortOrder.Descending,
+        )
+
+        # Fetch results
+        results = list(client.results(search))
+
+        if not results:
+            return {"content": [{"type": "text", "text": f"No ArXiv papers found for: {query}"}]}
+
+        output_lines = [
+            f"Found {len(results)} ArXiv papers for: {query}\n",
+            "=" * 60,
+        ]
+
+        paper_data = []
+        for i, paper in enumerate(results, 1):
+            # Get PDF URL (ArXiv always has PDFs)
+            pdf_url = paper.pdf_url
+
+            # Format authors (limit to first 3)
+            authors = [a.name for a in paper.authors[:3]]
+            if len(paper.authors) > 3:
+                authors.append(f"et al. (+{len(paper.authors) - 3} more)")
+            authors_str = ", ".join(authors)
+
+            # Format categories
+            categories = ", ".join(paper.categories[:3])
+
+            # Format date
+            pub_date = paper.published.strftime("%Y-%m-%d")
+
+            # Truncate abstract
+            abstract = paper.summary.replace("\n", " ")[:300]
+            if len(paper.summary) > 300:
+                abstract += "..."
+
+            paper_info = {
+                "title": paper.title,
+                "authors": authors_str,
+                "pdf_url": pdf_url,
+                "arxiv_id": paper.entry_id.split("/")[-1],
+                "categories": categories,
+                "published": pub_date,
+            }
+            paper_data.append(paper_info)
+
+            output_lines.extend(
+                [
+                    f"\n{i}. {paper.title}",
+                    f"   Authors: {authors_str}",
+                    f"   ArXiv ID: {paper_info['arxiv_id']}",
+                    f"   Categories: {categories}",
+                    f"   Published: {pub_date}",
+                    f"   📄 PDF: {pdf_url}",
+                    f"   Abstract: {abstract}",
+                ]
+            )
+
+        # Add summary of PDF URLs for easy downloading
+        output_lines.extend(
+            [
+                "\n" + "=" * 60,
+                "\n📥 PDF URLs for download:",
+            ]
+        )
+        for paper in paper_data:
+            output_lines.append(f"  - {paper['pdf_url']}")
+
+        return {"content": [{"type": "text", "text": "\n".join(output_lines)}]}
+
+    except Exception as e:
+        return {
+            "content": [{"type": "text", "text": f"ArXiv search error: {str(e)}"}],
+            "is_error": True,
+        }
+
+
+arxiv_search = tool(
+    name="arxiv_search",
+    description="Search ArXiv for academic papers. ArXiv is the primary repository for preprints in physics, mathematics, computer science, and related fields. Use this for finding cutting-edge research papers with guaranteed PDF access.",
+    input_schema={
+        "type": "object",
+        "properties": {
+            "query": {
+                "type": "string",
+                "description": "Search query (e.g., 'transformer attention mechanism', 'large language models')",
+            },
+            "max_results": {
+                "type": "integer",
+                "description": "Maximum number of results (default: 10, max: 50)",
+            },
+            "sort_by": {
+                "type": "string",
+                "enum": ["relevance", "date"],
+                "description": "Sort results by relevance or submission date (default: relevance)",
+            },
+            "category": {
+                "type": "string",
+                "description": "ArXiv category filter (e.g., 'cs.AI', 'cs.LG', 'cs.CL', 'stat.ML', 'physics')",
+            },
+        },
+        "required": ["query"],
+    },
+)(_arxiv_search_impl)
 
 
 # =============================================================================
@@ -583,6 +721,14 @@ write_report = tool(
 
 web_research_tools_server = create_sdk_mcp_server(
     name="web_research",
-    version="1.0.0",
-    tools=[web_search, download_pdfs, read_pdf, save_note, read_notes, write_report],
+    version="1.1.0",
+    tools=[
+        web_search,
+        arxiv_search,
+        download_pdfs,
+        read_pdf,
+        save_note,
+        read_notes,
+        write_report,
+    ],
 )

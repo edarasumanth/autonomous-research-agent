@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from web_research_tools import (
     ResearchConfig,
+    _arxiv_search_impl,
     _download_pdfs_impl,
     _extract_filename_from_url,
     _is_pdf_url,
@@ -328,6 +329,119 @@ class TestWebSearch:
                 assert "is_error" not in result or not result.get("is_error")
                 assert "Found 2 results" in result["content"][0]["text"]
                 assert "Test Paper 1" in result["content"][0]["text"]
+
+
+class TestArxivSearch:
+    """Tests for _arxiv_search_impl function with mocked ArXiv API."""
+
+    @pytest.mark.asyncio
+    async def test_arxiv_search_success(self):
+        """Test ArXiv search with mocked response."""
+        from datetime import datetime
+
+        # Create mock paper objects
+        mock_paper1 = MagicMock()
+        mock_paper1.title = "Attention Is All You Need"
+        mock_paper1.pdf_url = "https://arxiv.org/pdf/1706.03762.pdf"
+        mock_paper1.entry_id = "http://arxiv.org/abs/1706.03762"
+        mock_paper1.summary = "We propose a new simple network architecture, the Transformer."
+        mock_paper1.published = datetime(2017, 6, 12)
+        mock_paper1.categories = ["cs.CL", "cs.LG"]
+
+        mock_author1 = MagicMock()
+        mock_author1.name = "Ashish Vaswani"
+        mock_author2 = MagicMock()
+        mock_author2.name = "Noam Shazeer"
+        mock_paper1.authors = [mock_author1, mock_author2]
+
+        mock_paper2 = MagicMock()
+        mock_paper2.title = "BERT: Pre-training of Deep Bidirectional Transformers"
+        mock_paper2.pdf_url = "https://arxiv.org/pdf/1810.04805.pdf"
+        mock_paper2.entry_id = "http://arxiv.org/abs/1810.04805"
+        mock_paper2.summary = "We introduce BERT, a new language representation model."
+        mock_paper2.published = datetime(2018, 10, 11)
+        mock_paper2.categories = ["cs.CL"]
+
+        mock_author3 = MagicMock()
+        mock_author3.name = "Jacob Devlin"
+        mock_paper2.authors = [mock_author3]
+
+        with patch("web_research_tools.arxiv.Client") as mock_client_class:
+            with patch("web_research_tools.arxiv.Search"):
+                mock_client = MagicMock()
+                mock_client.results.return_value = [mock_paper1, mock_paper2]
+                mock_client_class.return_value = mock_client
+
+                result = await _arxiv_search_impl(
+                    {"query": "transformer attention", "max_results": 5}
+                )
+
+                assert "is_error" not in result or not result.get("is_error")
+                text = result["content"][0]["text"]
+                assert "Found 2 ArXiv papers" in text
+                assert "Attention Is All You Need" in text
+                assert "BERT" in text
+                assert "arxiv.org/pdf" in text
+
+    @pytest.mark.asyncio
+    async def test_arxiv_search_no_results(self):
+        """Test ArXiv search with no results."""
+        with patch("web_research_tools.arxiv.Client") as mock_client_class:
+            with patch("web_research_tools.arxiv.Search"):
+                mock_client = MagicMock()
+                mock_client.results.return_value = []
+                mock_client_class.return_value = mock_client
+
+                result = await _arxiv_search_impl({"query": "xyznonexistent123"})
+
+                text = result["content"][0]["text"]
+                assert "No ArXiv papers found" in text
+
+    @pytest.mark.asyncio
+    async def test_arxiv_search_with_category(self):
+        """Test ArXiv search with category filter."""
+        from datetime import datetime
+
+        mock_paper = MagicMock()
+        mock_paper.title = "Test ML Paper"
+        mock_paper.pdf_url = "https://arxiv.org/pdf/2301.00000.pdf"
+        mock_paper.entry_id = "http://arxiv.org/abs/2301.00000"
+        mock_paper.summary = "A test paper about machine learning."
+        mock_paper.published = datetime(2023, 1, 1)
+        mock_paper.categories = ["cs.LG", "stat.ML"]
+
+        mock_author = MagicMock()
+        mock_author.name = "Test Author"
+        mock_paper.authors = [mock_author]
+
+        with patch("web_research_tools.arxiv.Client") as mock_client_class:
+            with patch("web_research_tools.arxiv.Search") as mock_search_class:
+                mock_client = MagicMock()
+                mock_client.results.return_value = [mock_paper]
+                mock_client_class.return_value = mock_client
+
+                result = await _arxiv_search_impl(
+                    {"query": "machine learning", "category": "cs.LG", "max_results": 10}
+                )
+
+                # Verify Search was called with category
+                mock_search_class.assert_called_once()
+                call_kwargs = mock_search_class.call_args
+                assert "cs.LG" in call_kwargs[1]["query"]
+
+                text = result["content"][0]["text"]
+                assert "Test ML Paper" in text
+
+    @pytest.mark.asyncio
+    async def test_arxiv_search_error_handling(self):
+        """Test ArXiv search error handling."""
+        with patch("web_research_tools.arxiv.Client") as mock_client_class:
+            mock_client_class.side_effect = Exception("Network error")
+
+            result = await _arxiv_search_impl({"query": "test query"})
+
+            assert result.get("is_error") is True
+            assert "ArXiv search error" in result["content"][0]["text"]
 
 
 class TestDownloadPdfs:

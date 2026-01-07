@@ -39,12 +39,22 @@ You can:
 
 ## Available Tools
 
-- **web_search**: Search for research papers and academic articles
+- **arxiv_search**: Search ArXiv for academic papers (PREFERRED for CS, ML, AI, physics, math topics - guaranteed PDF access)
+- **web_search**: Search the broader web for research papers and academic articles
 - **download_pdfs**: Download PDF files from URLs
 - **read_pdf**: Extract and read text from downloaded PDFs
 - **save_note**: Save important findings and insights
 - **read_notes**: Retrieve all saved notes
 - **write_report**: Generate a comprehensive markdown report
+
+## Search Strategy
+
+- **Use arxiv_search FIRST** for topics in: computer science, machine learning, AI, physics, mathematics, statistics
+  - ArXiv provides direct PDF links that always work
+  - You can filter by category (e.g., cs.AI, cs.LG, cs.CL, stat.ML)
+  - Sort by relevance or date for latest papers
+- **Use web_search** for: biology, medicine, social sciences, or when you need broader coverage
+- **Combine both** for comprehensive research
 
 ## Interaction Style
 
@@ -57,7 +67,7 @@ You can:
 ## Research Workflow
 
 When conducting research, ALWAYS follow these steps:
-1. Start with web searches to find relevant papers (at least 2-3 searches)
+1. Start with arxiv_search for ML/AI/CS topics, or web_search for other fields (at least 2-3 searches)
 2. Download the most promising PDFs (aim for 3-5 papers)
 3. Read and analyze the papers thoroughly
 4. Save key findings as notes using save_note
@@ -235,6 +245,11 @@ async def chat_with_agent(
                             if tool_name == "web_search":
                                 query = block.input.get("query", "")[:50]
                                 yield f"\n\n🔍 *Searching: {query}...*\n\n"
+                            elif tool_name == "arxiv_search":
+                                query = block.input.get("query", "")[:50]
+                                category = block.input.get("category", "")
+                                cat_str = f" [{category}]" if category else ""
+                                yield f"\n\n📚 *ArXiv Search{cat_str}: {query}...*\n\n"
                             elif tool_name == "download_pdfs":
                                 count = len(block.input.get("urls", []))
                                 yield f"\n\n📥 *Downloading {count} PDFs...*\n\n"
