@@ -264,6 +264,13 @@ if "stop_requested" not in st.session_state:
 if "chat_model" not in st.session_state:
     st.session_state.chat_model = "claude-sonnet-4-20250514"
 
+# Email settings - load defaults from environment
+if "email_enabled" not in st.session_state:
+    st.session_state.email_enabled = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
+
+if "email_recipient" not in st.session_state:
+    st.session_state.email_recipient = os.getenv("EMAIL_TO", "")
+
 
 # =============================================================================
 # Helper Functions
@@ -312,6 +319,50 @@ with st.sidebar:
         st.session_state.current_view = "structured"
         st.session_state.selected_session = None
         st.rerun()
+
+    st.markdown("---")
+
+    # Email Settings Section
+    with st.expander("📧 Email Reports", expanded=False):
+        # Check if SMTP is configured
+        smtp_configured = all(
+            [
+                os.getenv("SMTP_HOST"),
+                os.getenv("SMTP_USER"),
+                os.getenv("SMTP_PASSWORD"),
+            ]
+        )
+
+        if smtp_configured:
+            st.session_state.email_enabled = st.checkbox(
+                "Send report when complete",
+                value=st.session_state.email_enabled,
+                key="email_toggle",
+            )
+
+            if st.session_state.email_enabled:
+                st.session_state.email_recipient = st.text_input(
+                    "Recipient email",
+                    value=st.session_state.email_recipient,
+                    key="email_recipient_input",
+                    placeholder="email@example.com",
+                )
+
+                # Test connection button
+                if st.button("Test Connection", key="test_email_btn"):
+                    from email_service import test_email_connection
+
+                    success, message = test_email_connection()
+                    if success:
+                        st.success(message)
+                    else:
+                        st.error(message)
+        else:
+            st.caption("Configure SMTP settings in .env to enable email reports")
+            st.code(
+                "SMTP_HOST=smtp.gmail.com\nSMTP_USER=your@email.com\nSMTP_PASSWORD=app_password",
+                language=None,
+            )
 
     st.markdown("---")
 
@@ -687,6 +738,34 @@ if st.session_state.current_view == "chat":
                         completion_data["last_updated"] = end_time.isoformat()
                         with open(completion_path, "w") as f:
                             json.dump(completion_data, f, indent=2)
+
+                        # Send email report if enabled
+                        if st.session_state.email_enabled and st.session_state.email_recipient:
+                            report_path = os.path.join(
+                                st.session_state.chat_session_path, "report.md"
+                            )
+                            if os.path.exists(report_path):
+                                try:
+                                    from email_service import send_email_report
+
+                                    with open(report_path, "r", encoding="utf-8") as f:
+                                        report_content = f.read()
+
+                                    topic_words = prompt.split()[:5]
+                                    topic = " ".join(topic_words)
+
+                                    success, message = send_email_report(
+                                        report_content=report_content,
+                                        topic=topic,
+                                        recipient=st.session_state.email_recipient,
+                                    )
+
+                                    if success:
+                                        st.success(f"📧 {message}")
+                                    else:
+                                        st.warning(f"📧 Email failed: {message}")
+                                except Exception as email_error:
+                                    st.warning(f"📧 Email error: {str(email_error)}")
 
                         # Show completion summary
                         st.success(

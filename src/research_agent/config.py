@@ -46,6 +46,17 @@ class Settings:
         default_factory=lambda: os.getenv("DEFAULT_SEARCH_DEPTH", "standard")
     )
 
+    # Email Settings
+    email_enabled: bool = field(
+        default_factory=lambda: os.getenv("EMAIL_ENABLED", "false").lower() == "true"
+    )
+    smtp_host: str = field(default_factory=lambda: os.getenv("SMTP_HOST", "smtp.gmail.com"))
+    smtp_port: int = field(default_factory=lambda: int(os.getenv("SMTP_PORT", "587")))
+    smtp_user: str = field(default_factory=lambda: os.getenv("SMTP_USER", ""))
+    smtp_password: str = field(default_factory=lambda: os.getenv("SMTP_PASSWORD", ""))
+    email_from: str = field(default_factory=lambda: os.getenv("EMAIL_FROM", ""))
+    email_to: str = field(default_factory=lambda: os.getenv("EMAIL_TO", ""))
+
     def __post_init__(self):
         """Initialize computed fields after dataclass creation."""
         if self.research_sessions_dir is None:
@@ -85,6 +96,34 @@ class Settings:
             "anthropic": self.anthropic_api_key,
             "tavily": self.tavily_api_key,
         }
+
+    def validate_email(self) -> list[str]:
+        """
+        Validate email settings.
+
+        Returns:
+            List of validation error messages (empty if valid).
+        """
+        if not self.email_enabled:
+            return []
+
+        errors = []
+        if not self.smtp_host:
+            errors.append("SMTP_HOST is not set")
+        if not self.smtp_user:
+            errors.append("SMTP_USER is not set")
+        if not self.smtp_password:
+            errors.append("SMTP_PASSWORD is not set")
+        if not self.email_from:
+            errors.append("EMAIL_FROM is not set")
+        if not self.email_to:
+            errors.append("EMAIL_TO is not set")
+        return errors
+
+    @property
+    def is_email_configured(self) -> bool:
+        """Check if email settings are properly configured."""
+        return self.email_enabled and len(self.validate_email()) == 0
 
 
 # Global settings instance
