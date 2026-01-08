@@ -21,6 +21,10 @@ load_dotenv()
 logger = logging.getLogger(__name__)
 
 
+# Default sender email for the research agent
+DEFAULT_SENDER_EMAIL = "edarasumanth@gmail.com"
+
+
 @dataclass
 class EmailConfig:
     """Email configuration for sending reports."""
@@ -30,7 +34,7 @@ class EmailConfig:
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    email_from: str = ""
+    email_from: str = DEFAULT_SENDER_EMAIL
     email_to: str = ""
 
     @classmethod
@@ -42,20 +46,28 @@ class EmailConfig:
             smtp_port=int(os.getenv("SMTP_PORT", "587")),
             smtp_user=os.getenv("SMTP_USER", ""),
             smtp_password=os.getenv("SMTP_PASSWORD", ""),
-            email_from=os.getenv("EMAIL_FROM", ""),
+            email_from=os.getenv("EMAIL_FROM", DEFAULT_SENDER_EMAIL),
             email_to=os.getenv("EMAIL_TO", ""),
         )
 
     def is_valid(self) -> bool:
-        """Check if email configuration is complete."""
+        """Check if email configuration is complete (excluding recipient)."""
         return all(
             [
-                self.enabled,
                 self.smtp_host,
                 self.smtp_user,
                 self.smtp_password,
                 self.email_from,
-                self.email_to,
+            ]
+        )
+
+    def is_smtp_configured(self) -> bool:
+        """Check if SMTP settings are configured for sending emails."""
+        return all(
+            [
+                self.smtp_host,
+                self.smtp_user,
+                self.smtp_password,
             ]
         )
 
@@ -230,7 +242,7 @@ def create_email_html(report_content: str, topic: str) -> str:
 def send_email_report(
     report_content: str,
     topic: str,
-    recipient: str | None = None,
+    recipient: str,
     config: EmailConfig | None = None,
 ) -> tuple[bool, str]:
     """
@@ -239,31 +251,33 @@ def send_email_report(
     Args:
         report_content: Markdown content of the research report
         topic: Research topic (used in subject line)
-        recipient: Override recipient email (uses config default if None)
+        recipient: Recipient email address (required)
         config: Email configuration (loads from env if None)
 
     Returns:
         Tuple of (success: bool, message: str)
     """
+    if not recipient or not recipient.strip():
+        return False, "No recipient email specified"
+
+    # Basic email validation
+    if "@" not in recipient or "." not in recipient:
+        return False, "Invalid email address format"
+
+    recipient = recipient.strip()
+
     if config is None:
         config = EmailConfig.from_env()
 
-    if not config.enabled:
-        return False, "Email is not enabled"
-
-    if not config.is_valid():
-        return False, "Email configuration is incomplete"
-
-    to_email = recipient or config.email_to
-    if not to_email:
-        return False, "No recipient email specified"
+    if not config.is_smtp_configured():
+        return False, "SMTP settings are not configured. Please configure SMTP_HOST, SMTP_USER, and SMTP_PASSWORD in .env"
 
     try:
         # Create message
         msg = MIMEMultipart("alternative")
         msg["Subject"] = f"Research Report: {topic[:50]}"
-        msg["From"] = config.email_from
-        msg["To"] = to_email
+        msg["From"] = config.email_from or DEFAULT_SENDER_EMAIL
+        msg["To"] = recipient
 
         # Plain text version
         text_part = MIMEText(report_content, "plain", "utf-8")
@@ -277,14 +291,15 @@ def send_email_report(
 
         # Send email
         context = ssl.create_default_context()
+        sender = config.email_from or DEFAULT_SENDER_EMAIL
 
         with smtplib.SMTP(config.smtp_host, config.smtp_port) as server:
             server.starttls(context=context)
             server.login(config.smtp_user, config.smtp_password)
-            server.sendmail(config.email_from, to_email, msg.as_string())
+            server.sendmail(sender, recipient, msg.as_string())
 
-        logger.info(f"Email sent successfully to {to_email}")
-        return True, f"Report sent to {to_email}"
+        logger.info(f"Email sent successfully to {recipient}")
+        return True, f"Report sent to {recipient}"
 
     except smtplib.SMTPAuthenticationError:
         error_msg = "SMTP authentication failed. Check your email credentials."
@@ -312,11 +327,8 @@ def test_email_connection(config: EmailConfig | None = None) -> tuple[bool, str]
     if config is None:
         config = EmailConfig.from_env()
 
-    if not config.enabled:
-        return False, "Email is not enabled"
-
-    if not config.is_valid():
-        return False, "Email configuration is incomplete"
+    if not config.is_smtp_configured():
+        return False, "SMTP settings are not configured"
 
     try:
         context = ssl.create_default_context()

@@ -4,7 +4,7 @@ Tests for email_service module.
 
 import pytest
 
-from email_service import EmailConfig, create_email_html, markdown_to_html
+from email_service import DEFAULT_SENDER_EMAIL, EmailConfig, create_email_html, markdown_to_html
 
 
 class TestEmailConfig:
@@ -18,29 +18,41 @@ class TestEmailConfig:
         assert config.smtp_port == 587
         assert config.smtp_user == ""
         assert config.smtp_password == ""
+        assert config.email_from == DEFAULT_SENDER_EMAIL
 
-    def test_is_valid_when_disabled(self):
-        """Test that disabled config is not valid."""
-        config = EmailConfig(enabled=False)
-        assert config.is_valid() is False
+    def test_default_sender_email(self):
+        """Test that default sender email is set correctly."""
+        assert DEFAULT_SENDER_EMAIL == "edarasumanth@gmail.com"
 
-    def test_is_valid_when_enabled_but_incomplete(self):
-        """Test that enabled but incomplete config is not valid."""
-        config = EmailConfig(enabled=True, smtp_host="smtp.gmail.com")
+    def test_is_valid_when_incomplete(self):
+        """Test that incomplete config is not valid."""
+        config = EmailConfig(smtp_host="smtp.gmail.com")
         assert config.is_valid() is False
 
     def test_is_valid_when_complete(self):
-        """Test that complete config is valid."""
+        """Test that complete config is valid (excludes recipient)."""
         config = EmailConfig(
-            enabled=True,
             smtp_host="smtp.gmail.com",
             smtp_port=587,
             smtp_user="user@gmail.com",
             smtp_password="password123",
             email_from="user@gmail.com",
-            email_to="recipient@example.com",
         )
         assert config.is_valid() is True
+
+    def test_is_smtp_configured_when_missing_settings(self):
+        """Test that SMTP is not configured when settings are missing."""
+        config = EmailConfig(smtp_host="smtp.gmail.com")
+        assert config.is_smtp_configured() is False
+
+    def test_is_smtp_configured_when_complete(self):
+        """Test that SMTP is configured when all required settings are present."""
+        config = EmailConfig(
+            smtp_host="smtp.gmail.com",
+            smtp_user="user@gmail.com",
+            smtp_password="password123",
+        )
+        assert config.is_smtp_configured() is True
 
 
 class TestMarkdownToHtml:

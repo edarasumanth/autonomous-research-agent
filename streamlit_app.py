@@ -264,12 +264,6 @@ if "stop_requested" not in st.session_state:
 if "chat_model" not in st.session_state:
     st.session_state.chat_model = "claude-sonnet-4-20250514"
 
-# Email settings - load defaults from environment
-if "email_enabled" not in st.session_state:
-    st.session_state.email_enabled = os.getenv("EMAIL_ENABLED", "false").lower() == "true"
-
-if "email_recipient" not in st.session_state:
-    st.session_state.email_recipient = os.getenv("EMAIL_TO", "")
 
 
 # =============================================================================
@@ -319,50 +313,6 @@ with st.sidebar:
         st.session_state.current_view = "structured"
         st.session_state.selected_session = None
         st.rerun()
-
-    st.markdown("---")
-
-    # Email Settings Section
-    with st.expander("📧 Email Reports", expanded=False):
-        # Check if SMTP is configured
-        smtp_configured = all(
-            [
-                os.getenv("SMTP_HOST"),
-                os.getenv("SMTP_USER"),
-                os.getenv("SMTP_PASSWORD"),
-            ]
-        )
-
-        if smtp_configured:
-            st.session_state.email_enabled = st.checkbox(
-                "Send report when complete",
-                value=st.session_state.email_enabled,
-                key="email_toggle",
-            )
-
-            if st.session_state.email_enabled:
-                st.session_state.email_recipient = st.text_input(
-                    "Recipient email",
-                    value=st.session_state.email_recipient,
-                    key="email_recipient_input",
-                    placeholder="email@example.com",
-                )
-
-                # Test connection button
-                if st.button("Test Connection", key="test_email_btn"):
-                    from email_service import test_email_connection
-
-                    success, message = test_email_connection()
-                    if success:
-                        st.success(message)
-                    else:
-                        st.error(message)
-        else:
-            st.caption("Configure SMTP settings in .env to enable email reports")
-            st.code(
-                "SMTP_HOST=smtp.gmail.com\nSMTP_USER=your@email.com\nSMTP_PASSWORD=app_password",
-                language=None,
-            )
 
     st.markdown("---")
 
@@ -739,34 +689,6 @@ if st.session_state.current_view == "chat":
                         with open(completion_path, "w") as f:
                             json.dump(completion_data, f, indent=2)
 
-                        # Send email report if enabled
-                        if st.session_state.email_enabled and st.session_state.email_recipient:
-                            report_path = os.path.join(
-                                st.session_state.chat_session_path, "report.md"
-                            )
-                            if os.path.exists(report_path):
-                                try:
-                                    from email_service import send_email_report
-
-                                    with open(report_path, "r", encoding="utf-8") as f:
-                                        report_content = f.read()
-
-                                    topic_words = prompt.split()[:5]
-                                    topic = " ".join(topic_words)
-
-                                    success, message = send_email_report(
-                                        report_content=report_content,
-                                        topic=topic,
-                                        recipient=st.session_state.email_recipient,
-                                    )
-
-                                    if success:
-                                        st.success(f"📧 {message}")
-                                    else:
-                                        st.warning(f"📧 Email failed: {message}")
-                                except Exception as email_error:
-                                    st.warning(f"📧 Email error: {str(email_error)}")
-
                         # Show completion summary
                         st.success(
                             f"✅ Research complete! Duration: {duration_seconds:.0f}s | Cost: ${cost_info.get('cost_usd', 0):.4f}"
@@ -1107,6 +1029,58 @@ elif st.session_state.current_view == "view_session" and st.session_state.select
         report = get_session_report(session["path"])
         if report:
             st.markdown(report)
+
+            # Email Report Section
+            st.markdown("---")
+            with st.expander("📧 Send Report via Email", expanded=False):
+                # Check if SMTP is configured
+                from email_service import EmailConfig
+
+                email_config = EmailConfig.from_env()
+                smtp_configured = email_config.is_smtp_configured()
+
+                if smtp_configured:
+                    st.markdown("Enter your email address to receive this report:")
+
+                    # Use session-specific key for email input
+                    email_key = f"email_input_{session['folder']}"
+                    recipient_email = st.text_input(
+                        "Your email address",
+                        key=email_key,
+                        placeholder="your.email@example.com",
+                        label_visibility="collapsed",
+                    )
+
+                    col1, col2 = st.columns([1, 3])
+                    with col1:
+                        send_clicked = st.button(
+                            "📤 Send Report",
+                            key=f"send_email_{session['folder']}",
+                            type="primary",
+                            use_container_width=True,
+                        )
+
+                    if send_clicked:
+                        if recipient_email and recipient_email.strip():
+                            from email_service import send_email_report
+
+                            with st.spinner("Sending email..."):
+                                success, message = send_email_report(
+                                    report_content=report,
+                                    topic=topic,
+                                    recipient=recipient_email.strip(),
+                                )
+
+                            if success:
+                                st.success(f"✅ {message}")
+                            else:
+                                st.error(f"❌ {message}")
+                        else:
+                            st.warning("Please enter your email address")
+                else:
+                    st.info(
+                        "📧 Email sending is not configured. Contact the administrator to enable SMTP settings."
+                    )
         else:
             # No report - check if there are notes to display
             notes_dir = os.path.join(session["path"], "notes")
